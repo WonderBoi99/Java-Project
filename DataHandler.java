@@ -123,6 +123,9 @@ public class DataHandler
 		}
 	}
 
+	
+	
+
     public boolean findCombo() 
     {
 		makeChecklist();
@@ -131,11 +134,32 @@ public class DataHandler
     	
     	try 
     	{
-    		Statement myStatement = connect.createStatement();
-    		results = myStatement.executeQuery("SELECT * FROM "+inputCategory);
+			Statement myStatement = connect.createStatement();
+    		results = myStatement.executeQuery("SELECT count(ID) FROM " + inputCategory);
+			results.next();
+			int numberOfRows = results.getInt(1);
+		
+    		myStatement = connect.createStatement();
+    		results = myStatement.executeQuery("SELECT * FROM " + inputCategory + " ORDER BY Price ASC");
 			int count = 0;
 			int cost = 0;
-    		
+			int start = 0;
+			/*
+			while(start < numberOfRows){
+				for(int r = start; r < numberOfRows; r++){
+				//find one combination and price
+				//store it
+				//record starting index of one element
+				//set start to starting index
+				//loop through from start and find new combination
+				//keep prices, keep info of cheapest
+				}
+
+			}
+			*/
+			
+
+
     		 while (results.next())
     		 {
     			 //printing the output to the console makes it more visual and helpful during debugging
