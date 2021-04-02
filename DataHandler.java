@@ -36,7 +36,7 @@ public class DataHandler
 
     
     public static void main(String[] args) {
-		DataHandler test = new DataHandler("filing", "Small", 1);
+		DataHandler test = new DataHandler("lamp", "Swing Arm", 1);
 		test.findCombo();
 	}
 
@@ -150,133 +150,140 @@ public class DataHandler
 			ArrayList <String> newID = new ArrayList <String>();
 			
 			int oldCost = 1000;
+			int counting = 0;
 			/*
 			
-			for(int start = 0; start < numberOfRows;start++){
-				for(int r = start; r < numberOfRows; r++){
-			
-				//record starting index of one element
-				//set start to starting index
-				//loop through from start and find new combination
-		
+				int counting = 0;
+			for(int start = 3; start < numberOfRows;start++){
+				while(counting < start){
+					results.next();
+					counting++;	
 				}
-
+				
+				while(results.next());
+				counting = 0;
 			}
 			*/
 			
 
-
-    		 while (results.next())
-    		 {
-    			 //printing the output to the console makes it more visual and helpful during debugging
-    			 // will occur throughout this program
+			for(int start = 0; start < numberOfRows;start++){
+				while(counting < start){
+					results.next();
+					counting++;	
+				}
+    			 while (results.next())
+    		 	{
+    			 	//printing the output to the console makes it more visual and helpful during debugging
+    			 	// will occur throughout this program
             
-				 String temp = results.getString("Type");
-				 if(temp.equals(inputType)){
-					if(checkList == 4)
-					{	
-						if(results.getString(a1[0]).equals("Y") && a1[1] == null){
+				 	String temp = results.getString("Type");
+				 	if(temp.equals(inputType)){
+						if(checkList == 4)
+						{	
+							if(results.getString(a1[0]).equals("Y") && a1[1] == null){
 							
-							a1[1] = "Y";
-							if(count == 0){
-								cost = totalCost + results.getInt("Price");
-								newID.add(results.getString("ID"));
-								count++;
-							}
+								a1[1] = "Y";
+								if(count == 0){
+									cost = totalCost + results.getInt("Price");
+									newID.add(results.getString("ID"));
+									count++;
+								}
 	
+							}
+						
+							if(results.getString(a2[0]).equals("Y") && a2[1] == null){
+								a2[1] = "Y";
+								if(count == 0){
+									cost = totalCost + results.getInt("Price");
+									newID.add(results.getString("ID"));
+									count++;
+								}
+	
+							}
+							if(results.getString(a3[0]).equals("Y") && a3[1] == null){
+								a3[1] = "Y";
+								if(count == 0){
+									cost = totalCost + results.getInt("Price");
+									newID.add(results.getString("ID"));
+									count++;
+								}
+
+							}
+							if(results.getString(a4[0]).equals("Y") && a4[1] == null){
+								a4[1] = "Y";
+								if(count == 0){
+									cost = totalCost + results.getInt("Price");
+									newID.add(results.getString("ID"));
+									count++;
+								}
+
+							}
 						}
 						
-						if(results.getString(a2[0]).equals("Y") && a2[1] == null){
-							a2[1] = "Y";
-							if(count == 0){
-								cost = totalCost + results.getInt("Price");
-								newID.add(results.getString("ID"));
-								count++;
-							}
-	
-						}
-						if(results.getString(a3[0]).equals("Y") && a3[1] == null){
-							a3[1] = "Y";
-							if(count == 0){
-								cost = totalCost + results.getInt("Price");
-								newID.add(results.getString("ID"));
-								count++;
-							}
+						else if(checkList == 3){
+							if(results.getString(a1[0]).equals("Y") && a1[1] == null){
+								a1[1] = "Y";
+								if(count == 0){
+									cost = totalCost + results.getInt("Price");
+									newID.add(results.getString("ID"));
+									count++;
+								}
 
-						}
-						if(results.getString(a4[0]).equals("Y") && a4[1] == null){
-							a4[1] = "Y";
-							if(count == 0){
-								cost = totalCost + results.getInt("Price");
-								newID.add(results.getString("ID"));
-								count++;
 							}
+							if(results.getString(a2[0]).equals("Y") && a2[1] == null){
+								a2[1] = "Y";
+								if(count == 0){
+									cost = totalCost + results.getInt("Price");
+									newID.add(results.getString("ID"));
+									count++;
+								}
 
+							}
+							if(results.getString(a3[0]).equals("Y") && a3[1] == null){
+								a3[1] = "Y";
+								if(count == 0){
+									cost = totalCost + results.getInt("Price");
+									newID.add(results.getString("ID"));
+									count++;
+								}
+
+							}
 						}
+						else if(checkList == 2){
+							if(results.getString(a1[0]).equals("Y") && a1[1] == null){
+								a1[1] = "Y";
+								if(count == 0){
+									cost = totalCost + results.getInt("Price");
+									newID.add(results.getString("ID"));
+									count++;
+								}
+
+							}
+							if(results.getString(a2[0]).equals("Y") && a2[1] == null){
+								a2[1] = "Y";
+								if(count == 0){
+									cost = totalCost + results.getInt("Price");
+									newID.add(results.getString("ID"));
+									count++;
+								}
+							}
+						}	
 					}
-					
-					else if(checkList == 3){
-						if(results.getString(a1[0]).equals("Y") && a1[1] == null){
-							a1[1] = "Y";
-							if(count == 0){
-								cost = totalCost + results.getInt("Price");
-								newID.add(results.getString("ID"));
-								count++;
-							}
-
-						}
-						if(results.getString(a2[0]).equals("Y") && a2[1] == null){
-							a2[1] = "Y";
-							if(count == 0){
-								cost = totalCost + results.getInt("Price");
-								newID.add(results.getString("ID"));
-								count++;
-							}
-
-						}
-						if(results.getString(a3[0]).equals("Y") && a3[1] == null){
-							a3[1] = "Y";
-							if(count == 0){
-								cost = totalCost + results.getInt("Price");
-								newID.add(results.getString("ID"));
-								count++;
-							}
-
-						}
-					}
-					else if(checkList == 2){
-						if(results.getString(a1[0]).equals("Y") && a1[1] == null){
-							a1[1] = "Y";
-							if(count == 0){
-								cost = totalCost + results.getInt("Price");
-								newID.add(results.getString("ID"));
-								count++;
-							}
-
-						}
-						if(results.getString(a2[0]).equals("Y") && a2[1] == null){
-							a2[1] = "Y";
-							if(count == 0){
-								cost = totalCost + results.getInt("Price");
-								newID.add(results.getString("ID"));
-								count++;
-							}
-						}
-					}	
+					count = 0;
+					totalCost = cost;
+					oldCost = totalCost;     
 				}
-				count = 0;
-				totalCost = cost;
-				oldCost = totalCost;     
-             }
-    		 System.out.println("<<<<"+oldCost+">>>>>>");
-			 System.out.println(newID);
-			 if(totalCost < oldCost){
-				oldCost = totalCost;
-				oldID = new ArrayList <String>(newID);
-				newID.clear();
+				System.out.println("<<<<"+oldCost+">>>>>>");
+				System.out.println(newID);
+				if(totalCost < oldCost){
+					oldCost = totalCost;
+					oldID = new ArrayList <String>(newID);
+					newID.clear();
+				}
+				counting = 0;
 			}
-
     		myStatement.close(); //close statement very important
+			System.out.println("=================== "+oldCost);
     	}
     	catch(SQLException e) 
     	{
