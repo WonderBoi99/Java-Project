@@ -147,21 +147,18 @@ public class DataHandler
 			int cost = 0;
 			//int start = 0;
 			ArrayList <String> oldID = new ArrayList <String>();
+			ArrayList <String> newID = new ArrayList <String>();
+			
 			int oldCost = 1000;
 			/*
-			int oldCost = 1000;
-			int newCost = 1000;
-			String [] oldID = new String[4];
-			String [] newID = new String[4];
-			while(start < numberOfRows){
+			
+			for(int start = 0; start < numberOfRows;start++){
 				for(int r = start; r < numberOfRows; r++){
-				//CODE THERE BELOW
-				//oldCost = totalCost
-				//store it
+			
 				//record starting index of one element
 				//set start to starting index
 				//loop through from start and find new combination
-				//keep prices, keep info of cheapest
+		
 				}
 
 			}
@@ -183,7 +180,7 @@ public class DataHandler
 							a1[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								oldID.add(results.getString("ID"));
+								newID.add(results.getString("ID"));
 								count++;
 							}
 	
@@ -193,7 +190,7 @@ public class DataHandler
 							a2[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								oldID.add(results.getString("ID"));
+								newID.add(results.getString("ID"));
 								count++;
 							}
 	
@@ -202,7 +199,7 @@ public class DataHandler
 							a3[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								oldID.add(results.getString("ID"));
+								newID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -211,7 +208,7 @@ public class DataHandler
 							a4[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								oldID.add(results.getString("ID"));
+								newID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -223,7 +220,7 @@ public class DataHandler
 							a1[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								oldID.add(results.getString("ID"));
+								newID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -232,7 +229,7 @@ public class DataHandler
 							a2[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								oldID.add(results.getString("ID"));
+								newID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -241,7 +238,7 @@ public class DataHandler
 							a3[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								oldID.add(results.getString("ID"));
+								newID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -252,7 +249,7 @@ public class DataHandler
 							a1[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								oldID.add(results.getString("ID"));
+								newID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -261,7 +258,7 @@ public class DataHandler
 							a2[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								oldID.add(results.getString("ID"));
+								newID.add(results.getString("ID"));
 								count++;
 							}
 						}
@@ -272,9 +269,14 @@ public class DataHandler
 				oldCost = totalCost;     
              }
     		 System.out.println("<<<<"+oldCost+">>>>>>");
-			 //Iterator <String> it
-			 System.out.println(oldID);
-    		 myStatement.close(); //close statement very important
+			 System.out.println(newID);
+			 if(totalCost < oldCost){
+				oldCost = totalCost;
+				oldID = new ArrayList <String>(newID);
+				newID.clear();
+			}
+
+    		myStatement.close(); //close statement very important
     	}
     	catch(SQLException e) 
     	{
