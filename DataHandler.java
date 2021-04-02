@@ -8,6 +8,8 @@
 //Hackathon/ENSF 409 Final project
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 //REMEMBER TO CHANGE LOGIN CREDENTIALS FOR DATABASE
 public class DataHandler 
@@ -143,11 +145,18 @@ public class DataHandler
     		results = myStatement.executeQuery("SELECT * FROM " + inputCategory + " ORDER BY Price ASC");
 			int count = 0;
 			int cost = 0;
-			int start = 0;
+			//int start = 0;
+			ArrayList <String> oldID = new ArrayList <String>();
+			int oldCost = 1000;
 			/*
+			int oldCost = 1000;
+			int newCost = 1000;
+			String [] oldID = new String[4];
+			String [] newID = new String[4];
 			while(start < numberOfRows){
 				for(int r = start; r < numberOfRows; r++){
-				//find one combination and price
+				//CODE THERE BELOW
+				//oldCost = totalCost
 				//store it
 				//record starting index of one element
 				//set start to starting index
@@ -174,7 +183,7 @@ public class DataHandler
 							a1[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								System.out.println(cost); 
+								oldID.add(results.getString("ID"));
 								count++;
 							}
 	
@@ -184,7 +193,7 @@ public class DataHandler
 							a2[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								System.out.println(cost); 
+								oldID.add(results.getString("ID"));
 								count++;
 							}
 	
@@ -193,7 +202,7 @@ public class DataHandler
 							a3[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								System.out.println(cost); 
+								oldID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -202,7 +211,7 @@ public class DataHandler
 							a4[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								System.out.println(cost); 
+								oldID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -214,7 +223,7 @@ public class DataHandler
 							a1[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								System.out.println(cost); 
+								oldID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -223,7 +232,7 @@ public class DataHandler
 							a2[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								System.out.println(cost); 
+								oldID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -232,7 +241,7 @@ public class DataHandler
 							a3[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								System.out.println(cost); 
+								oldID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -243,7 +252,7 @@ public class DataHandler
 							a1[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								System.out.println(cost); 
+								oldID.add(results.getString("ID"));
 								count++;
 							}
 
@@ -252,20 +261,19 @@ public class DataHandler
 							a2[1] = "Y";
 							if(count == 0){
 								cost = totalCost + results.getInt("Price");
-								System.out.println(cost); 
+								oldID.add(results.getString("ID"));
 								count++;
 							}
-
 						}
-
-					}
-					
-				 }
-				 count = 0;
-				 totalCost = cost;  
-				        
+					}	
+				}
+				count = 0;
+				totalCost = cost;
+				oldCost = totalCost;     
              }
-    		 System.out.println("<<<<"+totalCost+">>>>>>");
+    		 System.out.println("<<<<"+oldCost+">>>>>>");
+			 //Iterator <String> it
+			 System.out.println(oldID);
     		 myStatement.close(); //close statement very important
     	}
     	catch(SQLException e) 
