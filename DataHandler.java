@@ -1,9 +1,13 @@
 /**
- *@author Gibran Akmal <a 
+ *@author Gibran Akmal, 30094918
+ *@author John Kvellestad, 10125207
+ *@author Aashik Ilangovan, 30085993
+ *@author Nikhil Naikar, 30039350
 
-   href="mailto:gibran.akmal@ucalgary.ca">gibran.akmal@ucalgary.ca</a>
  *@version 1.2
  *@since 1.0
+
+ 
 */
 //Hackathon/ENSF 409 Final project
 
@@ -33,10 +37,14 @@ public class DataHandler
 	private int checkList = 0;
 	private int totalCost = 0;
 	private int id = 0;
+	private int count = 0;
+
+	private ArrayList <String> oldID = new ArrayList <String>();
+	private	ArrayList <String> newID = new ArrayList <String>();
 
     
     public static void main(String[] args) {
-		DataHandler test = new DataHandler("lamp", "Swing Arm", 1);
+		DataHandler test = new DataHandler("chair", "Task", 1);
 		test.findCombo();
 	}
 
@@ -94,10 +102,7 @@ public class DataHandler
         }
     }
     
-	//String a1[] = new String[2];
-	//String a2[] = new String[2];
-	//String a3[] = new String[2];
-	//String a4[] = new String[2];
+	
 	private void makeChecklist(){
 		if(inputCategory.equals("chair")){
 			a1[0] = "Legs";
@@ -126,16 +131,19 @@ public class DataHandler
 	}
 
 	
-	
-
     public boolean findCombo() 
     {
+		
 		makeChecklist();
     	//string buffer can hold alot together
     	//StringBuffer firstNlast = new StringBuffer();
     	
     	try 
     	{
+			int oldCost = 1000;
+			int newCost = 0;
+			//int counting = 0;
+
 			Statement myStatement = connect.createStatement();
     		results = myStatement.executeQuery("SELECT count(ID) FROM " + inputCategory);
 			results.next();
@@ -143,147 +151,45 @@ public class DataHandler
 		
     		myStatement = connect.createStatement();
     		results = myStatement.executeQuery("SELECT * FROM " + inputCategory + " ORDER BY Price ASC");
-			int count = 0;
-			int cost = 0;
-			//int start = 0;
-			ArrayList <String> oldID = new ArrayList <String>();
-			ArrayList <String> newID = new ArrayList <String>();
 			
-			int oldCost = 1000;
-			int counting = 0;
-			/*
 			
-				int counting = 0;
-			for(int start = 3; start < numberOfRows;start++){
-				while(counting < start){
-					results.next();
-					counting++;	
-				}
-				
-				while(results.next());
-				counting = 0;
-			}
-			*/
-			
-
 			for(int start = 0; start < numberOfRows;start++){
-				while(counting < start){
-					results.next();
-					counting++;	
-				}
-    			 while (results.next())
+				//while()
+    			while (results.next())
     		 	{
-    			 	//printing the output to the console makes it more visual and helpful during debugging
-    			 	// will occur throughout this program
-            
 				 	String temp = results.getString("Type");
 				 	if(temp.equals(inputType)){
 						if(checkList == 4)
 						{	
-							if(results.getString(a1[0]).equals("Y") && a1[1] == null){
-							
-								a1[1] = "Y";
-								if(count == 0){
-									cost = totalCost + results.getInt("Price");
-									newID.add(results.getString("ID"));
-									count++;
-								}
-	
-							}
-						
-							if(results.getString(a2[0]).equals("Y") && a2[1] == null){
-								a2[1] = "Y";
-								if(count == 0){
-									cost = totalCost + results.getInt("Price");
-									newID.add(results.getString("ID"));
-									count++;
-								}
-	
-							}
-							if(results.getString(a3[0]).equals("Y") && a3[1] == null){
-								a3[1] = "Y";
-								if(count == 0){
-									cost = totalCost + results.getInt("Price");
-									newID.add(results.getString("ID"));
-									count++;
-								}
-
-							}
-							if(results.getString(a4[0]).equals("Y") && a4[1] == null){
-								a4[1] = "Y";
-								if(count == 0){
-									cost = totalCost + results.getInt("Price");
-									newID.add(results.getString("ID"));
-									count++;
-								}
-
-							}
+							this.checklist(a1);
+							this.checklist(a2);
+							this.checklist(a3);
+							this.checklist(a4);
 						}
 						
 						else if(checkList == 3){
-							if(results.getString(a1[0]).equals("Y") && a1[1] == null){
-								a1[1] = "Y";
-								if(count == 0){
-									cost = totalCost + results.getInt("Price");
-									newID.add(results.getString("ID"));
-									count++;
-								}
-
-							}
-							if(results.getString(a2[0]).equals("Y") && a2[1] == null){
-								a2[1] = "Y";
-								if(count == 0){
-									cost = totalCost + results.getInt("Price");
-									newID.add(results.getString("ID"));
-									count++;
-								}
-
-							}
-							if(results.getString(a3[0]).equals("Y") && a3[1] == null){
-								a3[1] = "Y";
-								if(count == 0){
-									cost = totalCost + results.getInt("Price");
-									newID.add(results.getString("ID"));
-									count++;
-								}
-
-							}
+							this.checklist(a1);
+							this.checklist(a2);
+							this.checklist(a3);
 						}
 						else if(checkList == 2){
-							if(results.getString(a1[0]).equals("Y") && a1[1] == null){
-								a1[1] = "Y";
-								if(count == 0){
-									cost = totalCost + results.getInt("Price");
-									newID.add(results.getString("ID"));
-									count++;
-								}
-
-							}
-							if(results.getString(a2[0]).equals("Y") && a2[1] == null){
-								a2[1] = "Y";
-								if(count == 0){
-									cost = totalCost + results.getInt("Price");
-									newID.add(results.getString("ID"));
-									count++;
-								}
-							}
+							this.checklist(a1);
+							this.checklist(a2);
 						}	
 					}
 					count = 0;
-					totalCost = cost;
-					oldCost = totalCost;     
+					newCost = totalCost;     
 				}
-				System.out.println("<<<<"+oldCost+">>>>>>");
-				System.out.println(newID);
-				if(totalCost < oldCost){
-					oldCost = totalCost;
+				
+				if(newCost < oldCost){
+					oldCost = newCost;
 					oldID = new ArrayList <String>(newID);
 					newID.clear();
 				}
-				counting = 0;
 			}
     		myStatement.close(); //close statement very important
-			System.out.println("=================== "+oldCost);
+			System.out.println(oldCost);
+			System.out.println(oldID);
     	}
     	catch(SQLException e) 
     	{
@@ -292,6 +198,24 @@ public class DataHandler
     	
     	return false;
     }    
+	
+	private void checklist(String[] x){
+
+		try{
+			if(results.getString(x[0]).equals("Y") && x[1] == null){
+				x[1] = "Y";
+				if(count == 0){
+					totalCost = totalCost + results.getInt("Price");
+					newID.add(results.getString("ID"));
+					count++;
+				}
+			}
+		}
+		catch(SQLException e) 
+		{
+			e.printStackTrace();    		
+		}
+	}
     
 
 }
