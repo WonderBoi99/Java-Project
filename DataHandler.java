@@ -14,6 +14,7 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.lang.StringBuilder;
 
 //REMEMBER TO CHANGE LOGIN CREDENTIALS FOR DATABASE
 public class DataHandler 
@@ -133,31 +134,35 @@ public class DataHandler
 	
     public boolean findCombo() 
     {
-		
 		makeChecklist();
     	//string buffer can hold alot together
     	//StringBuffer firstNlast = new StringBuffer();
-    	
     	try 
     	{
 			int oldCost = 1000;
 			int newCost = 0;
-			//int counting = 0;
+			int counting = 0;
+			boolean combMade = false;
 
-			Statement myStatement = connect.createStatement();
+			Statement myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+			ResultSet.CONCUR_READ_ONLY);
     		results = myStatement.executeQuery("SELECT count(ID) FROM " + inputCategory);
 			results.next();
 			int numberOfRows = results.getInt(1);
 		
-    		myStatement = connect.createStatement();
+    		myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+			ResultSet.CONCUR_READ_ONLY);
     		results = myStatement.executeQuery("SELECT * FROM " + inputCategory + " ORDER BY Price ASC");
 			
-			
 			for(int start = 0; start < numberOfRows;start++){
-				//while()
+				while(counting < start){
+					results.next();
+					counting++;
+				}
     			while (results.next())
     		 	{
 				 	String temp = results.getString("Type");
+					System.out.println(results.getString("ID"));
 				 	if(temp.equals(inputType)){
 						if(checkList == 4)
 						{	
@@ -165,31 +170,53 @@ public class DataHandler
 							this.checklist(a2);
 							this.checklist(a3);
 							this.checklist(a4);
+							if(a1[1] != null && a2[1] != null && a3[1] != null && a4[1] != null){
+								combMade = true;
+							}
 						}
 						
 						else if(checkList == 3){
 							this.checklist(a1);
 							this.checklist(a2);
 							this.checklist(a3);
+							if(a1[1] != null && a2[1] != null && a3[1] != null){
+								combMade = true;
+							}
 						}
 						else if(checkList == 2){
 							this.checklist(a1);
 							this.checklist(a2);
+							if(a1[1] != null && a2[1] != null){
+								combMade = true;
+							}
 						}	
 					}
 					count = 0;
 					newCost = totalCost;     
 				}
+				System.out.println(newCost);
+				System.out.println(newID);
 				
-				if(newCost < oldCost){
+				if(newCost < oldCost && combMade){
 					oldCost = newCost;
 					oldID = new ArrayList <String>(newID);
-					newID.clear();
 				}
+				counting = 0;
+				a1[1] = null;
+				a2[1] = null;
+				a3[1] = null;
+				a4[1] = null;
+				totalCost = 0;
+				results.beforeFirst();
+				combMade = false;
+				newID.clear();
 			}
     		myStatement.close(); //close statement very important
-			System.out.println(oldCost);
+			System.out.println(">>>>>>>>>>>>>>>>"+oldCost);
 			System.out.println(oldID);
+			if(oldID.isEmpty()){
+				printRecommedations();
+			}
     	}
     	catch(SQLException e) 
     	{
@@ -200,7 +227,6 @@ public class DataHandler
     }    
 	
 	private void checklist(String[] x){
-
 		try{
 			if(results.getString(x[0]).equals("Y") && x[1] == null){
 				x[1] = "Y";
@@ -217,5 +243,38 @@ public class DataHandler
 		}
 	}
     
+	private void printRecommedations(){
+		try{
+			ArrayList<String> manuIDs = new ArrayList<String>();
+			Statement myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+			ResultSet.CONCUR_READ_ONLY);
+			
+			String qe = "SELECT DISTINCT ManuID FROM "+ inputCategory + " WHERE Type = ?";
+			PreparedStatement mySecondStatment = connect.prepareStatement(qe);
+			mySecondStatment.setString(1, inputType);
+			results = mySecondStatment.executeQuery();
 
+			while(results.next()){
+				manuIDs.add(results.getString("ManuID"));
+			}
+			
+			myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+			ResultSet.CONCUR_READ_ONLY);
+    		results = myStatement.executeQuery("SELECT * FROM manufacturer");
+			StringBuilder suggestions = new StringBuilder();
+			while(results.next()){
+				if(manuIDs.contains(results.getString("ManuID"))){
+					suggestions = suggestions.append(results.getString("Name") + ", ");
+				}
+			}
+			suggestions.setLength(suggestions.length()-2);
+			System.out.println("Suggested manufacturer: ");
+			System.out.println(suggestions.toString());
+			
+		}
+		catch(SQLException e) 
+		{
+			e.printStackTrace();    		
+		}
+	}
 }
