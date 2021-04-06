@@ -14,7 +14,9 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.lang.StringBuilder;
+import java.lang.Integer;
 
 //REMEMBER TO CHANGE LOGIN CREDENTIALS FOR DATABASE
 public class DataHandler 
@@ -42,10 +44,11 @@ public class DataHandler
 
 	private ArrayList <String> oldID = new ArrayList <String>();
 	private	ArrayList <String> newID = new ArrayList <String>();
+	private	ArrayList <String> usedID = new ArrayList <String>();
 
     
     public static void main(String[] args) {
-		DataHandler test = new DataHandler("chair", "Task", 1);
+		DataHandler test = new DataHandler("chair", "Task", 2);
 		test.findCombo();
 	}
 
@@ -139,6 +142,9 @@ public class DataHandler
     	//StringBuffer firstNlast = new StringBuffer();
     	try 
     	{
+			
+			ArrayList<ArrayList<String>> finalIds = new ArrayList<ArrayList<String>>();
+			ArrayList<Integer> finalCost = new ArrayList<Integer>();
 			int oldCost = 1000;
 			int newCost = 0;
 			int counting = 0;
@@ -197,10 +203,32 @@ public class DataHandler
 				System.out.println(newCost);
 				System.out.println(newID);
 				
-				if(newCost < oldCost && combMade){
-					oldCost = newCost;
-					oldID = new ArrayList <String>(newID);
+				boolean used = false;
+				for(int o = 0; o < finalIds.size(); o++){
+					ArrayList<String> tmp = finalIds.get(o);
+					for(int i = 0; i < tmp.size(); i++){
+						if(newID.contains(tmp.get(i))){
+							used = true;
+						}
+					}
 				}
+
+				if(combMade && !used){
+					
+						if(finalCost.size() < inputAmount){
+							finalCost.add(newCost);
+							finalIds.add(new ArrayList <String>(newID));
+						}
+						else if(newCost < Collections.max(finalCost)){
+							int index = finalCost.indexOf(Collections.max(finalCost));
+							finalCost.remove(index);
+							finalIds.remove(index);
+							finalCost.add(newCost);
+							finalIds.add(new ArrayList <String>(newID));
+						}
+					
+				}
+				
 				counting = 0;
 				a1[1] = null;
 				a2[1] = null;
@@ -212,8 +240,8 @@ public class DataHandler
 				newID.clear();
 			}
     		myStatement.close(); //close statement very important
-			System.out.println(">>>>>>>>>>>>>>>>"+oldCost);
-			System.out.println(oldID);
+			System.out.println(">>>>>>>>>>>>>>>>"+finalCost);
+			System.out.println(finalIds);
 			if(oldID.isEmpty()){
 				printRecommedations();
 			}
