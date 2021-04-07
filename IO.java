@@ -4,8 +4,8 @@
  *@author Aashik Ilangovan, 30085993
  *@author Nikhil Naikar, 30039350
 
- *@version 10
- *@since 9.0
+ *@version 11
+ *@since 10
 */
 
 import java.io.File;
@@ -14,36 +14,33 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
-//import java.util.stream.Sink.ChainedReference;
-
-import javax.xml.crypto.Data;
-
-
-
-
-
+import java.lang.StringBuilder;
 
 /**
- * IO class gets input from the user
+ * IO class collects input from user for order
  * Uses the DataHandler class to interact with the database
- * outputs processed data in a text file
+ * Looks for cheapeast combination to fill order from user
+ * If no combination found, recommendations of manufacturers will be displayed
+ * If yes combination found, will show and ask user if they are happy with the combination
+ * If user says yes, then a orderform.txt file will be made and the UsedIds will be deleted from the database
+ * If user says no, then recommendations of manufacturers will be displayed 
  */	
-
-public class IO
-{
-    private boolean combFound;
+public class IO{
     private String category;
     private String type;
     private int amount;
+    private int sum;
     private ArrayList<ArrayList<String>> allIds = new ArrayList<ArrayList<String>>();
 	private ArrayList<Integer> allCosts = new ArrayList<Integer>(); 
 
     public IO(){
     }
+
     /**
      * starts the program
      */
     public void start(){
+        boolean combFound;
         //Collecting user input
         askUser();
         //Trying to find cheapest combination
@@ -56,11 +53,14 @@ public class IO
         else{
             allIds = test.getFinalIds();
             allCosts = test.getFinalCost();
+            sum = test.sumOfCosts();
             boolean answer = checkWithUser();
             if(answer == true)
             {
                 //dataHandler.makeTxtFile;
                 System.out.println("Text file made");
+                makeFile();
+                test.deleteUsedIds();
                 System.exit(1);
             }
             else{
@@ -68,122 +68,149 @@ public class IO
                 System.exit(1);
             }
         }
-   
     }
 
     /**
      * Checks if user accepts the combinations found
+     * If user says yes, then a output.txt file will be made and the UsedIds will be deleted from the database
+     * If user says no, then recommendations of manufacturers will be displayed 
      */
     private boolean checkWithUser(){
         String answer;
         boolean tmp = false;
         Scanner in = new Scanner(System.in);
+        System.out.println("Order: "+type+" "+category+", "+amount);
         System.out.println("Here is what we can provide: ");
-        System.out.println(allCosts);
-		System.out.println(allIds);
-        System.out.println("Are you happy with this? (yes/no): ");
-        answer = in.nextLine();
-        if(answer.equals("yes")){
-            tmp = true;
+        for(int o = 0; o < allIds.size(); o++){
+            StringBuilder solution = new StringBuilder("ID: ");
+            ArrayList<String> temp = allIds.get(o);
+            for(int i = 0; i < temp.size(); i++){
+                solution = solution.append(temp.get(i)+", ");
+            }
+            solution.setLength(solution.length()-2);
+            solution.append(" => $"+allCosts.get(o));
+            System.out.println(solution.toString());
         }
-        else if(answer.equals("no")){
-            tmp = false;
+        System.out.println("Total Cost => $"+sum);
+        while(true){
+            System.out.println("Are you happy with this? (yes/no): ");
+            answer = in.nextLine();
+            if(answer.equals("yes")){
+                tmp = true;
+                break;
+            }
+            else if(answer.equals("no")){
+                tmp = false;
+                break;
+            }
+            System.out.println("Please enter yes or no");
         }   
         return tmp;
     }
+
     /**
      * gets input from user for category, type, and order size
      */
     private void askUser(){
         Scanner in = new Scanner(System.in);
         System.out.println("Start Program");
-        System.out.println("Furniture Categories => chair, desk, filing, lamp");
-        System.out.println("Please select one of the categories: ");
-        category = in.nextLine();
-        System.out.println("Chair types => Task, Mesh, Kneeling, Executive, Ergonomic");
-        System.out.println("Desk types => Traditional, Adjustable, Standing");
-        System.out.println("Filing types => Small, Medium, Large");
-        System.out.println("Lamp types => Desk, Swing Arm, Study");
-        System.out.println("Please select a appropriate type from the category chosen: ");
-        type = in.nextLine();
+        askForCategory();
+        System.out.println();
+        askForType();
+        System.out.println();
         System.out.println("Please specific the amount you would like: ");
         amount = in.nextInt();
+        System.out.println("-----------------------");
+    }
+
+    /**
+     * keeps asking user for category until they input a category that exists
+     */
+    private void askForCategory(){
+        Scanner in = new Scanner(System.in);
+        while(true){
+            System.out.println("Please select one of the categories: ");
+            System.out.println("Furniture Categories => chair, desk, filing, lamp");
+            category = in.nextLine();
+            if(category.equals("chair") || category.equals("desk") || category.equals("filing") || category.equals("lamp")){
+                break;
+            }
+            System.out.println("Spelling mistake or "+category+" category does not exist");
+        }
+    }
+
+    /**
+     * keeps asking user for type until they input a correct type in the specific category they chose
+     */
+    private void askForType(){
+        Scanner in = new Scanner(System.in);
+        while(true){
+            System.out.println("Please select a appropriate type from the category chosen: ");
+            System.out.println("Chair types => Task, Mesh, Kneeling, Executive, Ergonomic");
+            System.out.println("Desk types => Traditional, Adjustable, Standing");
+            System.out.println("Filing types => Small, Medium, Large");
+            System.out.println("Lamp types => Desk, Swing Arm, Study");
+            type = in.nextLine();
+            if(category.equals("chair")){
+                if(type.equals("Task") || type.equals("Mesh") || type.equals("Kneeling") || type.equals("Executive") || type.equals("Ergonomic")){
+                    break;
+                }
+            }
+            else if(category.equals("desk")){
+                if(type.equals("Traditional") || type.equals("Adjustable") || type.equals("Standing")){
+                    break;
+                }
+            }
+            else if(category.equals("filing")){
+                if(type.equals("Small") || type.equals("Medium") || type.equals("Large")){
+                    break;
+                }
+            }
+            else if(category.equals("lamp")){
+                if(type.equals("Desk") || type.equals("Swing Arm") || type.equals("Study")){
+                    break;
+                }
+            }
+            
+            System.out.println("Spelling mistake or "+type+" is not a type in "+category+" category");
+        }
     }
     
-    
-    //data member for output handling
-	public FileWriter output;
-	
 	/**
-	 * No return type. Only performs output actions
-	 * Takes in required information and formats it onto an output file 
+	 * Makes a orderform.txt file with some information  
 	 * Following the specified format of the given example
-	 * Overloaded method in case order cannot be fulfilled
-	 * @param furnitureType is the piece of furniture that the customer wants e.g(chair)
-	 * @param units is how many of that specific type of furniture the user is requesting
-	 * @param ID is an array list consisting of all the ID's of the pieces used to fulfill a VALID COMPLETE order
-	 * @param totalPrice is the total price of an order that can be fulfilled
 	 */	
-	public void output(String furnitureType, int units, ArrayList<String> ID,  double totalPrice) 
-	{
-		
-		try 
-		{
+	public void makeFile(){
+		try{   
+            FileWriter output;
+
 			//the output FileWriter will output to a text file called "output.txt"			
-			this.output = new FileWriter("orderform.txt", false); //the second parameter of false tells it to overwrite an existing file of that name if it exists
+			output = new FileWriter("orderform.txt", false); //the second parameter of false tells it to overwrite an existing file of that name if it exists
 			
-			this.output.write("Furniture Order Form\n\n");
-			this.output.write("Faculty Name: \n");
-			this.output.write("Contact: \n");
-			this.output.write("Date: \n\n");
+			output.write("Furniture Order Form\n\n");
+			output.write("Faculty Name: \n");
+			output.write("Contact: \n");
+			output.write("Date: \n\n");
 			
-			this.output.write("Original Request: " + furnitureType + ", /" + units + "\n\n");
+			output.write("Original Request: "+type+" "+category+", "+amount+"\n\n");
 			
-			this.output.write("Items Ordered\n");
+			output.write("Items Ordered:\n");
 			
-			for(int counter = 0; counter < ID.size(); counter++) 
-			{
-				this.output.write("ID: " + ID.get(counter) + "\n");
-			}
+            for(int o = 0; o < allIds.size(); o++){
+                ArrayList<String> tmp = allIds.get(o);
+                for(int i = 0; i < tmp.size(); i++){
+                    output.write(tmp.get(i)+"\n");
+                }
+            }
 			
-			this.output.write("\nTotal Price: $" + "totalPrice");
-			
-			
+			output.write("\nTotal Price: $" + sum);
+
+            output.close();
 		}
-		catch(IOException e) 	//exception for output file
-		{
-			//System.out.println("error occurred with the output file");
+		catch(IOException e){
 			e.printStackTrace();
 		}
-	}
-	
-	
-	//overloaded method
-	//if only these two arguments are supplied, this means the order was unsuccessful
-	public void output(String furnitureType, int units) 
-	{
-		try 
-		{
-			//the output FileWriter will output to a text file called "output.txt"			
-			this.output = new FileWriter("output.txt", false); //the second parameter of false tells it to overwrite an existing file
-			
-			this.output.write("User request: " + furnitureType + ", " + units + "\n" );
-			this.output.write("Output " + "Order cannot be fulfilled based on current inventory. Suggested manufacturers are: \n\n");
-			this.output.write("Office Furnishings\n");
-			this.output.write("Chairs R Us\n");
-			this.output.write("Furniture Goods\n");
-			this.output.write("Fine Office Supplies\n\n\n");
-			this.output.write("Sorry we didn't have what you were looking for, please come back next time!");
-			
-		}
-		catch(IOException e) 	//exception for output file
-		{
-			//System.out.println("error occurred with the output file")
-			e.printStackTrace();
-		}	
-		
-	}
+	}	
 }
 
-//end of class declaration
 

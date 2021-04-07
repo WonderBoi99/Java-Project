@@ -4,8 +4,8 @@
  *@author Aashik Ilangovan, 30085993
  *@author Nikhil Naikar, 30039350
 
- *@version 10
- *@since 9.0
+ *@version 11
+ *@since 10
 */
 
 import java.sql.*;
@@ -20,9 +20,9 @@ DataHandler is the main functionality of the program apart from user input
 It handles interaction with the database and calculation of recommendations
 */
 public class DataHandler {
-
+	
 	public final String DBURL = "jdbc:mysql://localhost/inventory"; //store the database url information
-    public final String USERNAME = "naikar";	//store the user's account username
+    public final String USERNAME = "scm";	//store the user's account username
     public final String PASSWORD =  "ensf409";	//store the user's account password
 
     private Connection connect; //connection
@@ -45,6 +45,15 @@ public class DataHandler {
 	private ArrayList<Integer> finalCost = new ArrayList<Integer>();
 	//stores the total cost of each combination in finalIds
 	
+	/**
+	 * When code is run
+	 * Program will ask for user input of category, type and amount separately
+	 * Calulates if cheapest combination is avaiable
+	 * If no combination found, recommendations of manufacturers will be displayed
+	 * If yes combination found, will show and ask user if they are happy with the combination
+	 * If user says yes, then a orderform.txt file will be made and the UsedIds will be deleted from the database
+	 * If user says no, then recommendations of manufacturers will be displayed
+	 */
     public static void main(String[] args){
 		IO test = new IO();
 		test.start();
@@ -75,6 +84,14 @@ public class DataHandler {
 		return finalCost;
 	}
     
+	//return all the costs in String format
+	public int sumOfCosts(){
+		int sum = 0;
+		for(int i = 0; i < finalCost.size(); i++){
+			sum = sum + finalCost.get(i);
+		}
+		return sum;
+	}
     /**
 	 * Initializes connection with the database
 	 * no return type or params
@@ -306,6 +323,27 @@ public class DataHandler {
 		return tmp;
 	}
 
+	/**
+     * UsedIds will be deleted from the database 
+     */
+	public void deleteUsedIds(){
+		try{
+			String qe;
+			PreparedStatement myFinalStatment;
+			for(int o = 0; o < finalIds.size(); o++){
+				ArrayList<String> tmp = finalIds.get(o);
+				for(int i = 0; i < tmp.size(); i++){
+					qe = "DELETE FROM " + inputCategory + " WHERE ID = ?";
+					myFinalStatment = connect.prepareStatement(qe);
+					myFinalStatment.setString(1, tmp.get(i));
+					myFinalStatment.executeUpdate();	
+					}
+				}
+		}
+		catch(SQLException e){
+    		e.printStackTrace();    		
+    	}
+	}
 
 	/**
 	 * performs a validity check on a column in one row of results
@@ -357,7 +395,7 @@ public class DataHandler {
 			}
 			//formatting stuff
 			suggestions.setLength(suggestions.length()-2);
-			System.out.println("Suggested manufacturer(s): ");
+			System.out.println("Order cannot be fulfilled. Suggested manufacturer(s) are: ");
 			System.out.println(suggestions.toString());
 		}
 		catch(SQLException e) 
