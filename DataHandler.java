@@ -15,29 +15,35 @@ import java.util.Collections;
 import java.lang.StringBuilder;
 import java.lang.Integer;
 
-//REMEMBER TO CHANGE LOGIN CREDENTIALS FOR DATABASE
+/**
+DataHandler is the main functionality of the program apart from user input
+It handles interaction with the database and calculation of recommendations
+*/
 public class DataHandler {
-	public final String DBURL = "jdbc:mysql://localhost/inventory"; 
-    public final String USERNAME = "naikar";	
-    public final String PASSWORD =  "ensf409";	
 
-    private Connection connect; 
-    private ResultSet results;	
+	public final String DBURL = "jdbc:mysql://localhost/inventory"; //store the database url information
+    public final String USERNAME = "naikar";	//store the user's account username
+    public final String PASSWORD =  "ensf409";	//store the user's account password
 
-    private String inputCategory;
-    private String inputType;
-    private int inputAmount;
+    private Connection connect; //connection
+    private ResultSet results;	//results of query
 
-	private int checkList = 0;
-	private int totalCost = 0;
-	private int count = 0;
-	private String a1[] = new String[2];
-	private String a2[] = new String[2];
-	private String a3[] = new String[2];
-	private String a4[] = new String[2];
-	private	ArrayList <String> newID = new ArrayList <String>();
+    private String inputCategory; //category from user
+    private String inputType; //type from user
+    private int inputAmount; //amount from user
+
+	private int checkList = 0; //how many columns the current list has
+	private int totalCost = 0; //total cost of current combination
+	private int count = 0; //count of options for a specified column
+	private String a1[] = new String[2]; //data column 1
+	private String a2[] = new String[2]; //data column 2
+	private String a3[] = new String[2]; //data column 3
+	private String a4[] = new String[2]; //data column 4
+	private	ArrayList <String> newID = new ArrayList <String>(); //stores IDs of new valid combination
 	private ArrayList<ArrayList<String>> finalIds = new ArrayList<ArrayList<String>>();
+	//stores the specified number of combinations of IDs
 	private ArrayList<Integer> finalCost = new ArrayList<Integer>();
+	//stores the total cost of each combination in finalIds
 	
     public static void main(String[] args){
 		IO test = new IO();
@@ -60,10 +66,12 @@ public class DataHandler {
     }
 
 	public ArrayList<ArrayList<String>> getFinalIds(){
+		//returns finalIds
 		return finalIds;
 	}
 
 	public ArrayList<Integer> getFinalCost(){
+		//returns finalCost
 		return finalCost;
 	}
     
@@ -98,7 +106,9 @@ public class DataHandler {
             e.printStackTrace();
         }
     }
-    
+    /**
+	 * determines what attributes the item has based on its category
+	 */
 	private void makeChecklist(){
 		if(inputCategory.equals("chair")){
 			a1[0] = "Legs";
@@ -125,7 +135,9 @@ public class DataHandler {
 			checkList = 2;
 		}
 	}
-
+	/**
+	 * finds the valid combinations for the user
+	 */
     public boolean findCombo() {
 		boolean orderFilled = false;
 		makeChecklist();
@@ -148,7 +160,7 @@ public class DataHandler {
 				}
     			combMade = lookForOneCombination();
 				boolean used = checkUsed();
-				if(combMade && !used){
+				if(combMade && !used){ //if valid and not already used
 					mainStrategy();
 				}
 				resetVariables();
@@ -163,21 +175,31 @@ public class DataHandler {
     	}	
     	return orderFilled;
     } 
-	
+	/**
+	 * determines if the most recent valid combination should be stored
+	 */
 	private void mainStrategy(){
-		if(finalCost.size() < inputAmount){
+		if(finalCost.size() < inputAmount){ //if not enough combinations made, then always store
 			finalCost.add(totalCost);
 			finalIds.add(new ArrayList <String>(newID));
 		}
-		else if(totalCost < Collections.max(finalCost)){
+		else if(totalCost < Collections.max(finalCost)){ 
+			//if new combination cheaper than current most expensive combination
 			int index = finalCost.indexOf(Collections.max(finalCost));
+			//get index of most expensive combination
 			finalCost.remove(index);
+			//remove index from cost
 			finalIds.remove(index);
+			//remove index from finalIds
 			finalCost.add(totalCost);
+			//add new combination cost
 			finalIds.add(new ArrayList <String>(newID));
+			//add new combination Ids
 		}
 	}
-
+	/**
+	 * finds a single valid combination
+	 */
 	private boolean lookForOneCombination(){
 		boolean tmp = false;
 		try{
@@ -203,7 +225,9 @@ public class DataHandler {
     	}
 		return tmp;
 	}
-
+	/**
+	 * determines if an item has already been used in a different combination
+	 */
 	private boolean checkUsed(){
 		boolean temp = false;
 		for(int o = 0; o < finalIds.size(); o++){
@@ -216,7 +240,9 @@ public class DataHandler {
 		}
 		return temp;
 	}
-
+	/**
+	 * resets attributes to base state
+	 */
 	private void resetVariables(){
 		a1[1] = null;
 		a2[1] = null;
@@ -231,6 +257,9 @@ public class DataHandler {
     		e.printStackTrace();    		
     	}
 	}
+	/**
+	 * sets up a validity check for each column for the chair type
+	 */
 	private boolean checklistForChair(){
 		boolean tmp = false;
 		checklist(a1);
@@ -245,7 +274,9 @@ public class DataHandler {
 		}
 		return tmp;
 	}
-
+	/**
+	 * sets up a validity check for each column for the desk or filing types
+	 */
 	private boolean checklistForDeskOrFiling(){
 		boolean tmp = false;
 		checklist(a1);
@@ -259,7 +290,9 @@ public class DataHandler {
 		}
 		return tmp;
 	}
-
+	/**
+	 * sets up a validity check for each column for the lamp type
+	 */
 	private boolean checklistForLamp(){
 		boolean tmp = false;
 		checklist(a1);
@@ -274,7 +307,9 @@ public class DataHandler {
 	}
 
 
-	
+	/**
+	 * performs a validity check on a column in one row of results
+	 */	
 	private void checklist(String[] x){
 		try{
 			if(results.getString(x[0]).equals("Y") && x[1] == null){
@@ -293,7 +328,9 @@ public class DataHandler {
 			e.printStackTrace();    		
 		}
 	}
-    
+    /**
+	 * prints recommendations for manufacturers if not able to fill order
+	 */
 	public void printRecommedations(){
 		try{
 			StringBuilder suggestions = new StringBuilder();

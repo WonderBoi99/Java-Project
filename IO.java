@@ -1,3 +1,13 @@
+/**
+ *@author Gibran Akmal, 30094918
+ *@author John Kvellestad, 10125207
+ *@author Aashik Ilangovan, 30085993
+ *@author Nikhil Naikar, 30039350
+
+ *@version 10
+ *@since 9.0
+*/
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -14,9 +24,9 @@ import javax.xml.crypto.Data;
 
 
 /**
- * IO class handles all input and output activities of the program
- * Mainly involves reading from the data base
- * taking in processed information to be formatted into an output file
+ * IO class gets input from the user
+ * Uses the DataHandler class to interact with the database
+ * outputs processed data in a text file
  */	
 
 public class IO
@@ -30,7 +40,9 @@ public class IO
 
     public IO(){
     }
-
+    /**
+     * starts the program
+     */
     public void start(){
         //Collecting user input
         askUser();
@@ -59,7 +71,9 @@ public class IO
    
     }
 
-    
+    /**
+     * Checks if user accepts the combinations found
+     */
     private boolean checkWithUser(){
         String answer;
         boolean tmp = false;
@@ -77,7 +91,9 @@ public class IO
         }   
         return tmp;
     }
-
+    /**
+     * gets input from user for category, type, and order size
+     */
     private void askUser(){
         Scanner in = new Scanner(System.in);
         System.out.println("Start Program");
