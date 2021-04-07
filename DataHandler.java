@@ -4,12 +4,9 @@
  *@author Aashik Ilangovan, 30085993
  *@author Nikhil Naikar, 30039350
 
- *@version 1.2
+ *@version 9.0
  *@since 1.0
-
- 
 */
-//Hackathon/ENSF 409 Final project
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,32 +18,25 @@ import java.lang.Integer;
 //REMEMBER TO CHANGE LOGIN CREDENTIALS FOR DATABASE
 public class DataHandler 
 {
-	public final String DBURL = "jdbc:mysql://localhost/inventory"; //store the database url information
-    public final String USERNAME = "naikar";	//"scm"; //store the user's account username
-    public final String PASSWORD =  "ensf409";	//"ensf409"; //store the user's account password
+	public final String DBURL = "jdbc:mysql://localhost/inventory"; 
+    public final String USERNAME = "naikar";	
+    public final String PASSWORD =  "ensf409";	
     
-    private Connection connect;  //data member for connection
-    private ResultSet results;	// data member for results
-    
+    private Connection connect; 
+    private ResultSet results;	
     
     private String inputCategory;
     private String inputType;
     private int inputAmount;
-
+	private int checkList = 0;
+	private int totalCost = 0;
+	private int count = 0;
 	private String a1[] = new String[2];
 	private String a2[] = new String[2];
 	private String a3[] = new String[2];
 	private String a4[] = new String[2];
-	private int checkList = 0;
-	private int totalCost = 0;
-	private int id = 0;
-	private int count = 0;
-
-	private ArrayList <String> oldID = new ArrayList <String>();
 	private	ArrayList <String> newID = new ArrayList <String>();
-	private	ArrayList <String> usedID = new ArrayList <String>();
-
-    
+	
     public static void main(String[] args) {
 		DataHandler test = new DataHandler("chair", "Task", 2);
 		test.findCombo();
@@ -138,28 +128,22 @@ public class DataHandler
     public boolean findCombo() 
     {
 		makeChecklist();
-    	//string buffer can hold alot together
-    	//StringBuffer firstNlast = new StringBuffer();
     	try 
     	{
-			
 			ArrayList<ArrayList<String>> finalIds = new ArrayList<ArrayList<String>>();
 			ArrayList<Integer> finalCost = new ArrayList<Integer>();
 			int oldCost = 1000;
 			int newCost = 0;
 			int counting = 0;
 			boolean combMade = false;
-
 			Statement myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
 			ResultSet.CONCUR_READ_ONLY);
     		results = myStatement.executeQuery("SELECT count(ID) FROM " + inputCategory);
 			results.next();
 			int numberOfRows = results.getInt(1);
-		
     		myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
 			ResultSet.CONCUR_READ_ONLY);
     		results = myStatement.executeQuery("SELECT * FROM " + inputCategory + " ORDER BY Price ASC");
-			
 			for(int start = 0; start < numberOfRows;start++){
 				while(counting < start){
 					results.next();
@@ -200,9 +184,6 @@ public class DataHandler
 					count = 0;
 					newCost = totalCost;     
 				}
-				System.out.println(newCost);
-				System.out.println(newID);
-				
 				boolean used = false;
 				for(int o = 0; o < finalIds.size(); o++){
 					ArrayList<String> tmp = finalIds.get(o);
@@ -212,23 +193,19 @@ public class DataHandler
 						}
 					}
 				}
-
 				if(combMade && !used){
-					
-						if(finalCost.size() < inputAmount){
-							finalCost.add(newCost);
-							finalIds.add(new ArrayList <String>(newID));
-						}
-						else if(newCost < Collections.max(finalCost)){
-							int index = finalCost.indexOf(Collections.max(finalCost));
-							finalCost.remove(index);
-							finalIds.remove(index);
-							finalCost.add(newCost);
-							finalIds.add(new ArrayList <String>(newID));
-						}
-					
+					if(finalCost.size() < inputAmount){
+						finalCost.add(newCost);
+						finalIds.add(new ArrayList <String>(newID));
+					}
+					else if(newCost < Collections.max(finalCost)){
+						int index = finalCost.indexOf(Collections.max(finalCost));
+						finalCost.remove(index);
+						finalIds.remove(index);
+						finalCost.add(newCost);
+						finalIds.add(new ArrayList <String>(newID));
+					}
 				}
-				
 				counting = 0;
 				a1[1] = null;
 				a2[1] = null;
@@ -238,11 +215,11 @@ public class DataHandler
 				results.beforeFirst();
 				combMade = false;
 				newID.clear();
+				System.out.println(finalCost);
+				System.out.println(finalIds);
 			}
     		myStatement.close(); //close statement very important
-			System.out.println(">>>>>>>>>>>>>>>>"+finalCost);
-			System.out.println(finalIds);
-			if(oldID.isEmpty()){
+			if(finalIds.size() != inputAmount){
 				printRecommedations();
 			}
     	}
