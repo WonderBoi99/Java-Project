@@ -4,8 +4,8 @@
  *@author Aashik Ilangovan, 30085993
  *@author Nikhil Naikar, 30039350
 
- *@version 9.0
- *@since 1.0
+ *@version 10
+ *@since 9.0
 */
 
 import java.sql.*;
@@ -16,18 +16,18 @@ import java.lang.StringBuilder;
 import java.lang.Integer;
 
 //REMEMBER TO CHANGE LOGIN CREDENTIALS FOR DATABASE
-public class DataHandler 
-{
+public class DataHandler {
 	public final String DBURL = "jdbc:mysql://localhost/inventory"; 
     public final String USERNAME = "naikar";	
     public final String PASSWORD =  "ensf409";	
-    
+
     private Connection connect; 
     private ResultSet results;	
-    
+
     private String inputCategory;
     private String inputType;
     private int inputAmount;
+
 	private int checkList = 0;
 	private int totalCost = 0;
 	private int count = 0;
@@ -36,12 +36,13 @@ public class DataHandler
 	private String a3[] = new String[2];
 	private String a4[] = new String[2];
 	private	ArrayList <String> newID = new ArrayList <String>();
+	private ArrayList<ArrayList<String>> finalIds = new ArrayList<ArrayList<String>>();
+	private ArrayList<Integer> finalCost = new ArrayList<Integer>();
 	
-    public static void main(String[] args) {
-		DataHandler test = new DataHandler("chair", "Task", 2);
-		test.findCombo();
+    public static void main(String[] args){
+		IO test = new IO();
+		test.start();
 	}
-
 
     /**
 	 * Constructor for DataHandler Class
@@ -50,22 +51,27 @@ public class DataHandler
 	 * @param USERNAME is the username to access the database with
 	 * @param PASSWORD is the password corresponding to that username
 	 */	
-    public DataHandler(String category, String type, int amount) 
-    {
+    public DataHandler(String category, String type, int amount){
     	//these data members initalized based on where the user's database is located
     	initializeConnection();
     	inputCategory = category;
     	inputType = type;
     	inputAmount = amount;
     }
-    
+
+	public ArrayList<ArrayList<String>> getFinalIds(){
+		return finalIds;
+	}
+
+	public ArrayList<Integer> getFinalCost(){
+		return finalCost;
+	}
     
     /**
 	 * Initializes connection with the database
 	 * no return type or params
 	 */	
-    public void initializeConnection() 
-    {
+    public void initializeConnection(){
     	// enclose within try catch so any SQL exceptions are caught
     	try 
     	{
@@ -78,25 +84,21 @@ public class DataHandler
     	}
     }
     
-    
     /**
      * private custom method that closes everything and releases all resources
 	 * no return type and has no args
 	 */
-    public void close() 
-    {
-        try {
+    public void close(){
+        try{
             results.close();
             connect.close();
         } 
-        
         catch (SQLException e) 
         {
             e.printStackTrace();
         }
     }
     
-	
 	private void makeChecklist(){
 		if(inputCategory.equals("chair")){
 			a1[0] = "Legs";
@@ -124,119 +126,163 @@ public class DataHandler
 		}
 	}
 
-	
-    public boolean findCombo() 
-    {
+    public boolean findCombo() {
+		boolean orderFilled = false;
 		makeChecklist();
     	try 
     	{
-			ArrayList<ArrayList<String>> finalIds = new ArrayList<ArrayList<String>>();
-			ArrayList<Integer> finalCost = new ArrayList<Integer>();
-			int oldCost = 1000;
-			int newCost = 0;
-			int counting = 0;
-			boolean combMade = false;
-			Statement myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
-			ResultSet.CONCUR_READ_ONLY);
+			Statement myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			//statement for getting the number of rows in table
     		results = myStatement.executeQuery("SELECT count(ID) FROM " + inputCategory);
 			results.next();
 			int numberOfRows = results.getInt(1);
-    		myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
-			ResultSet.CONCUR_READ_ONLY);
+			//statement for getting and putting the data from user picked table in ascending order depending on Price
     		results = myStatement.executeQuery("SELECT * FROM " + inputCategory + " ORDER BY Price ASC");
 			for(int start = 0; start < numberOfRows;start++){
+				int counting = 0;
+				boolean combMade = false;
+				//for skipping rows
 				while(counting < start){
 					results.next();
 					counting++;
 				}
-    			while (results.next())
-    		 	{
-				 	String temp = results.getString("Type");
-					System.out.println(results.getString("ID"));
-				 	if(temp.equals(inputType)){
-						if(checkList == 4)
-						{	
-							this.checklist(a1);
-							this.checklist(a2);
-							this.checklist(a3);
-							this.checklist(a4);
-							if(a1[1] != null && a2[1] != null && a3[1] != null && a4[1] != null){
-								combMade = true;
-							}
-						}
-						
-						else if(checkList == 3){
-							this.checklist(a1);
-							this.checklist(a2);
-							this.checklist(a3);
-							if(a1[1] != null && a2[1] != null && a3[1] != null){
-								combMade = true;
-							}
-						}
-						else if(checkList == 2){
-							this.checklist(a1);
-							this.checklist(a2);
-							if(a1[1] != null && a2[1] != null){
-								combMade = true;
-							}
-						}	
-					}
-					count = 0;
-					newCost = totalCost;     
-				}
-				boolean used = false;
-				for(int o = 0; o < finalIds.size(); o++){
-					ArrayList<String> tmp = finalIds.get(o);
-					for(int i = 0; i < tmp.size(); i++){
-						if(newID.contains(tmp.get(i))){
-							used = true;
-						}
-					}
-				}
+    			combMade = lookForOneCombination();
+				boolean used = checkUsed();
 				if(combMade && !used){
-					if(finalCost.size() < inputAmount){
-						finalCost.add(newCost);
-						finalIds.add(new ArrayList <String>(newID));
-					}
-					else if(newCost < Collections.max(finalCost)){
-						int index = finalCost.indexOf(Collections.max(finalCost));
-						finalCost.remove(index);
-						finalIds.remove(index);
-						finalCost.add(newCost);
-						finalIds.add(new ArrayList <String>(newID));
-					}
+					mainStrategy();
 				}
-				counting = 0;
-				a1[1] = null;
-				a2[1] = null;
-				a3[1] = null;
-				a4[1] = null;
-				totalCost = 0;
-				results.beforeFirst();
-				combMade = false;
-				newID.clear();
-				System.out.println(finalCost);
-				System.out.println(finalIds);
+				resetVariables();
 			}
     		myStatement.close(); //close statement very important
-			if(finalIds.size() != inputAmount){
-				printRecommedations();
+			if(finalIds.size() == inputAmount){
+				orderFilled = true;
 			}
     	}
-    	catch(SQLException e) 
-    	{
+    	catch(SQLException e){
+    		e.printStackTrace();    		
+    	}	
+    	return orderFilled;
+    } 
+	
+	private void mainStrategy(){
+		if(finalCost.size() < inputAmount){
+			finalCost.add(totalCost);
+			finalIds.add(new ArrayList <String>(newID));
+		}
+		else if(totalCost < Collections.max(finalCost)){
+			int index = finalCost.indexOf(Collections.max(finalCost));
+			finalCost.remove(index);
+			finalIds.remove(index);
+			finalCost.add(totalCost);
+			finalIds.add(new ArrayList <String>(newID));
+		}
+	}
+
+	private boolean lookForOneCombination(){
+		boolean tmp = false;
+		try{
+			while (results.next())
+			{
+				String temp = results.getString("Type");
+				if(temp.equals(inputType)){
+					if(checkList == 4){	
+						tmp = checklistForChair();
+					}
+					else if(checkList == 3){
+						tmp = checklistForDeskOrFiling();
+					}
+					else if(checkList == 2){
+						tmp = checklistForLamp();
+					}	
+				}
+				count = 0;     
+			}
+		}
+		catch(SQLException e){
     		e.printStackTrace();    		
     	}
-    	
-    	return false;
-    }    
+		return tmp;
+	}
+
+	private boolean checkUsed(){
+		boolean temp = false;
+		for(int o = 0; o < finalIds.size(); o++){
+			ArrayList<String> tmp = finalIds.get(o);
+			for(int i = 0; i < tmp.size(); i++){
+				if(newID.contains(tmp.get(i))){
+					temp = true;
+				}
+			}
+		}
+		return temp;
+	}
+
+	private void resetVariables(){
+		a1[1] = null;
+		a2[1] = null;
+		a3[1] = null;
+		a4[1] = null;
+		totalCost = 0;
+		newID.clear();
+		try{
+			results.beforeFirst();
+		}
+		catch(SQLException e){
+    		e.printStackTrace();    		
+    	}
+	}
+	private boolean checklistForChair(){
+		boolean tmp = false;
+		checklist(a1);
+		checklist(a2);
+		checklist(a3);
+		checklist(a4);
+		if(a1[1] != null && a2[1] != null && a3[1] != null && a4[1] != null){
+			tmp = true;
+		}
+		else{
+			tmp = false;
+		}
+		return tmp;
+	}
+
+	private boolean checklistForDeskOrFiling(){
+		boolean tmp = false;
+		checklist(a1);
+		checklist(a2);
+		checklist(a3);
+		if(a1[1] != null && a2[1] != null && a3[1] != null){
+			tmp = true;
+		}
+		else{
+			tmp = false;
+		}
+		return tmp;
+	}
+
+	private boolean checklistForLamp(){
+		boolean tmp = false;
+		checklist(a1);
+		checklist(a2);
+		if(a1[1] != null && a2[1] != null){
+			tmp = true;
+		}
+		else{
+			tmp = false;
+		}
+		return tmp;
+	}
+
+
 	
 	private void checklist(String[] x){
 		try{
 			if(results.getString(x[0]).equals("Y") && x[1] == null){
 				x[1] = "Y";
+				//only want to add cost to totalCost once for each row
 				if(count == 0){
 					totalCost = totalCost + results.getInt("Price");
+					//recording the IDs
 					newID.add(results.getString("ID"));
 					count++;
 				}
@@ -248,34 +294,34 @@ public class DataHandler
 		}
 	}
     
-	private void printRecommedations(){
+	public void printRecommedations(){
 		try{
+			StringBuilder suggestions = new StringBuilder();
 			ArrayList<String> manuIDs = new ArrayList<String>();
-			Statement myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
-			ResultSet.CONCUR_READ_ONLY);
-			
-			String qe = "SELECT DISTINCT ManuID FROM "+ inputCategory + " WHERE Type = ?";
+			Statement myStatement;
+			String qe;
+			//making prepared statement for getting all ManuID related to type
+			qe = "SELECT DISTINCT ManuID FROM "+ inputCategory + " WHERE Type = ?";
 			PreparedStatement mySecondStatment = connect.prepareStatement(qe);
 			mySecondStatment.setString(1, inputType);
 			results = mySecondStatment.executeQuery();
-
+			//storing the ManuID in manuIDs for later use
 			while(results.next()){
 				manuIDs.add(results.getString("ManuID"));
 			}
-			
-			myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
-			ResultSet.CONCUR_READ_ONLY);
+			//making statement for getting data from manufacturer table
+			myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
     		results = myStatement.executeQuery("SELECT * FROM manufacturer");
-			StringBuilder suggestions = new StringBuilder();
+			//storing the names for the manuIDs collected earlier
 			while(results.next()){
 				if(manuIDs.contains(results.getString("ManuID"))){
 					suggestions = suggestions.append(results.getString("Name") + ", ");
 				}
 			}
+			//formatting stuff
 			suggestions.setLength(suggestions.length()-2);
-			System.out.println("Suggested manufacturer: ");
+			System.out.println("Suggested manufacturer(s): ");
 			System.out.println(suggestions.toString());
-			
 		}
 		catch(SQLException e) 
 		{
