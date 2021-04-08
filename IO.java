@@ -4,9 +4,10 @@
  *@author Aashik Ilangovan, 30085993
  *@author Nikhil Naikar, 30039350
 
- *@version 11
- *@since 10
+ *@version 12
+ *@since 11
 */
+package edu.ucalgary.ensf409;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,14 +27,18 @@ import java.lang.StringBuilder;
  * If user says no, then recommendations of manufacturers will be displayed 
  */	
 public class IO{
-    private String category;
-    private String type;
-    private int amount;
-    private int sum;
-    private ArrayList<ArrayList<String>> allIds = new ArrayList<ArrayList<String>>();
-	private ArrayList<Integer> allCosts = new ArrayList<Integer>(); 
+    private String category; //store user selected category
+    private String type; //stores user selected type
+    private int amount; //stores user selected amount
+    private int sum; //stored total cost from combinations
+    private ArrayList<ArrayList<String>> allIds; //stores all the IDs used to fill order
+	private ArrayList<Integer> allCosts; //stores all the separate costs for different chosen combinations
 
+    //constructor
     public IO(){
+        sum = 0;
+        allIds = new ArrayList<ArrayList<String>>();
+        allCosts = new ArrayList<Integer>();
     }
 
     /**
@@ -48,6 +53,7 @@ public class IO{
         combFound = test.findCombo();
         if(combFound == false){
             test.printRecommedations();
+            test.close();
             System.exit(1);
         }
         else{
@@ -61,10 +67,12 @@ public class IO{
                 System.out.println("Text file made");
                 makeFile();
                 test.deleteUsedIds();
+                test.close();
                 System.exit(1);
             }
             else{
                 test.printRecommedations();
+                test.close();
                 System.exit(1);
             }
         }
@@ -72,7 +80,7 @@ public class IO{
 
     /**
      * Checks if user accepts the combinations found
-     * If user says yes, then a output.txt file will be made and the UsedIds will be deleted from the database
+     * If user says yes, then a orderform.txt file will be made and the UsedIds will be deleted from the database
      * If user says no, then recommendations of manufacturers will be displayed 
      */
     private boolean checkWithUser(){
@@ -174,7 +182,6 @@ public class IO{
                     break;
                 }
             }
-            
             System.out.println("Spelling mistake or "+type+" is not a type in "+category+" category");
         }
     }
@@ -186,28 +193,21 @@ public class IO{
 	public void makeFile(){
 		try{   
             FileWriter output;
-
 			//the output FileWriter will output to a text file called "output.txt"			
 			output = new FileWriter("orderform.txt", false); //the second parameter of false tells it to overwrite an existing file of that name if it exists
-			
 			output.write("Furniture Order Form\n\n");
 			output.write("Faculty Name: \n");
 			output.write("Contact: \n");
 			output.write("Date: \n\n");
-			
 			output.write("Original Request: "+type+" "+category+", "+amount+"\n\n");
-			
 			output.write("Items Ordered:\n");
-			
             for(int o = 0; o < allIds.size(); o++){
                 ArrayList<String> tmp = allIds.get(o);
                 for(int i = 0; i < tmp.size(); i++){
                     output.write(tmp.get(i)+"\n");
                 }
             }
-			
 			output.write("\nTotal Price: $" + sum);
-
             output.close();
 		}
 		catch(IOException e){

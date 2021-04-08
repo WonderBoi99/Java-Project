@@ -7,6 +7,7 @@
  *@version 12
  *@since 11
 */
+package edu.ucalgary.ensf409;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ It handles interaction with the database and calculation of recommendations
 public class DataHandler {
 	
 	public final String DBURL = "jdbc:mysql://localhost/inventory"; //store the database url information
-    public final String USERNAME = "naikar";	//store the user's account username
+    public final String USERNAME = "scm";	//store the user's account username
     public final String PASSWORD =  "ensf409";	//store the user's account password
 
     private Connection connect; //connection
@@ -86,7 +87,7 @@ public class DataHandler {
 		return finalCost;
 	}
     
-	//return all the costs in String format
+	//returns the sum of all the costs 
 	public int sumOfCosts(){
 		int sum = 0;
 		for(int i = 0; i < finalCost.size(); i++){
@@ -94,37 +95,32 @@ public class DataHandler {
 		}
 		return sum;
 	}
+
     /**
-	 * Initializes connection with the database
-	 * no return type or params
+	 * initializes connection with the database
 	 */	
     public void initializeConnection(){
-    	// enclose within try catch so any SQL exceptions are caught
-    	try 
-    	{
-    		//connection initialized using the credentials provided on object creation
+    	try{
     		connect = DriverManager.getConnection(DBURL, USERNAME, PASSWORD);
     	}
-    	catch(SQLException e) 
-    	{
+    	catch(SQLException e){
     		e.printStackTrace();
     	}
     }
     
     /**
-     * private custom method that closes everything and releases all resources
-	 * no return type and has no args
+     * closes results and connect 
 	 */
     public void close(){
         try{
             results.close();
             connect.close();
         } 
-        catch (SQLException e) 
-        {
+        catch (SQLException e){
             e.printStackTrace();
         }
     }
+
     /**
 	 * determines what attributes the item has based on its category
 	 */
@@ -154,14 +150,14 @@ public class DataHandler {
 			checkList = 2;
 		}
 	}
+
 	/**
-	 * finds the valid combinations for the user
+	 * finds the valid combinations for the user's order
 	 */
-    public boolean findCombo() {
+    public boolean findCombo(){
 		boolean orderFilled = false;
 		makeChecklist();
-    	try 
-    	{
+    	try{
 			Statement myStatement = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			//statement for getting the number of rows in table
     		results = myStatement.executeQuery("SELECT count(ID) FROM " + inputCategory);
@@ -194,6 +190,7 @@ public class DataHandler {
     	}	
     	return orderFilled;
     } 
+
 	/**
 	 * determines if the most recent valid combination should be stored
 	 */
@@ -216,14 +213,14 @@ public class DataHandler {
 			//add new combination Ids
 		}
 	}
+
 	/**
 	 * finds a single valid combination
 	 */
 	private boolean lookForOneCombination(){
 		boolean tmp = false;
 		try{
-			while (results.next())
-			{
+			while (results.next()){
 				String temp = results.getString("Type");
 				if(temp.equals(inputType)){
 					if(checkList == 4){	
@@ -244,6 +241,7 @@ public class DataHandler {
     	}
 		return tmp;
 	}
+
 	/**
 	 * updates usedIds with all the Ids that have be selected as a temp combination from finalIds
 	 */
@@ -256,7 +254,6 @@ public class DataHandler {
 			}
 		}
 	}
-
 
 	/**
 	 * resets attributes to base state
@@ -275,6 +272,7 @@ public class DataHandler {
     		e.printStackTrace();    		
     	}
 	}
+
 	/**
 	 * sets up a validity check for each column for the chair type
 	 */
@@ -292,6 +290,7 @@ public class DataHandler {
 		}
 		return tmp;
 	}
+
 	/**
 	 * sets up a validity check for each column for the desk or filing types
 	 */
@@ -308,6 +307,7 @@ public class DataHandler {
 		}
 		return tmp;
 	}
+
 	/**
 	 * sets up a validity check for each column for the lamp type
 	 */
@@ -329,17 +329,16 @@ public class DataHandler {
      */
 	public void deleteUsedIds(){
 		try{
-			String qe;
-			PreparedStatement myFinalStatment;
+			String qe = "DELETE FROM " + inputCategory + " WHERE ID = ?";
+			PreparedStatement myFinalStatment = connect.prepareStatement(qe);
 			for(int o = 0; o < finalIds.size(); o++){
 				ArrayList<String> tmp = finalIds.get(o);
 				for(int i = 0; i < tmp.size(); i++){
-					qe = "DELETE FROM " + inputCategory + " WHERE ID = ?";
-					myFinalStatment = connect.prepareStatement(qe);
 					myFinalStatment.setString(1, tmp.get(i));
 					myFinalStatment.executeUpdate();	
-					}
 				}
+			}
+			myFinalStatment.close();
 		}
 		catch(SQLException e){
     		e.printStackTrace();    		
@@ -363,11 +362,11 @@ public class DataHandler {
 				}
 			}
 		}
-		catch(SQLException e) 
-		{
+		catch(SQLException e){
 			e.printStackTrace();    		
 		}
 	}
+
     /**
 	 * prints recommendations for manufacturers if not able to fill order
 	 */
@@ -376,10 +375,11 @@ public class DataHandler {
 			StringBuilder suggestions = new StringBuilder();
 			ArrayList<String> manuIDs = new ArrayList<String>();
 			Statement myStatement;
+			PreparedStatement mySecondStatment;
 			String qe;
 			//making prepared statement for getting all ManuID related to type
 			qe = "SELECT DISTINCT ManuID FROM "+ inputCategory + " WHERE Type = ?";
-			PreparedStatement mySecondStatment = connect.prepareStatement(qe);
+			mySecondStatment = connect.prepareStatement(qe);
 			mySecondStatment.setString(1, inputType);
 			results = mySecondStatment.executeQuery();
 			//storing the ManuID in manuIDs for later use
@@ -396,12 +396,39 @@ public class DataHandler {
 				}
 			}
 			//formatting stuff
+			if(suggestions.length() == 0){
+				printAllManufacturers();
+			}
+			else{
+				suggestions.setLength(suggestions.length()-2);
+				System.out.println("Order cannot be fulfilled. Suggested manufacturer(s) are: ");
+				System.out.println(suggestions.toString());
+			}
+			myStatement.close();
+			mySecondStatment.close();
+		}
+		catch(SQLException e){
+			e.printStackTrace();    		
+		}
+	}
+
+	/**
+	 * Prints out all of the manufacturers names avaiable
+	 */
+	private void printAllManufacturers(){
+		try{
+			StringBuilder suggestions = new StringBuilder();
+			Statement myStat = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			results = myStat.executeQuery("SELECT * FROM manufacturer");
+			while(results.next()){
+				suggestions = suggestions.append(results.getString("Name") + ", ");
+			}
 			suggestions.setLength(suggestions.length()-2);
 			System.out.println("Order cannot be fulfilled. Suggested manufacturer(s) are: ");
 			System.out.println(suggestions.toString());
+			myStat.close();
 		}
-		catch(SQLException e) 
-		{
+		catch(SQLException e){
 			e.printStackTrace();    		
 		}
 	}
