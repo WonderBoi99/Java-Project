@@ -4,8 +4,8 @@
  *@author Aashik Ilangovan, 30085993
  *@author Nikhil Naikar, 30039350
 
- *@version 11
- *@since 10
+ *@version 12
+ *@since 11
 */
 
 import java.sql.*;
@@ -22,7 +22,7 @@ It handles interaction with the database and calculation of recommendations
 public class DataHandler {
 	
 	public final String DBURL = "jdbc:mysql://localhost/inventory"; //store the database url information
-    public final String USERNAME = "scm";	//store the user's account username
+    public final String USERNAME = "naikar";	//store the user's account username
     public final String PASSWORD =  "ensf409";	//store the user's account password
 
     private Connection connect; //connection
@@ -44,11 +44,13 @@ public class DataHandler {
 	//stores the specified number of combinations of IDs
 	private ArrayList<Integer> finalCost = new ArrayList<Integer>();
 	//stores the total cost of each combination in finalIds
+	private ArrayList<String> usedIds = new ArrayList<String>();
+	//stores all the Ids that have been used
 	
 	/**
 	 * When code is run
 	 * Program will ask for user input of category, type and amount separately
-	 * Calulates if cheapest combination is avaiable
+	 * Looks for the cheapest combination(s) if avaiable
 	 * If no combination found, recommendations of manufacturers will be displayed
 	 * If yes combination found, will show and ask user if they are happy with the combination
 	 * If user says yes, then a orderform.txt file will be made and the UsedIds will be deleted from the database
@@ -176,9 +178,9 @@ public class DataHandler {
 					counting++;
 				}
     			combMade = lookForOneCombination();
-				boolean used = checkUsed();
-				if(combMade && !used){ //if valid and not already used
+				if(combMade){ //if valid and not already used
 					mainStrategy();
+					updateUsedIds();
 				}
 				resetVariables();
 			}
@@ -243,20 +245,19 @@ public class DataHandler {
 		return tmp;
 	}
 	/**
-	 * determines if an item has already been used in a different combination
+	 * updates usedIds with all the Ids that have be selected as a temp combination from finalIds
 	 */
-	private boolean checkUsed(){
-		boolean temp = false;
+	private void updateUsedIds(){
+		usedIds.clear();
 		for(int o = 0; o < finalIds.size(); o++){
 			ArrayList<String> tmp = finalIds.get(o);
 			for(int i = 0; i < tmp.size(); i++){
-				if(newID.contains(tmp.get(i))){
-					temp = true;
-				}
+				usedIds.add(tmp.get(i));
 			}
 		}
-		return temp;
 	}
+
+
 	/**
 	 * resets attributes to base state
 	 */
@@ -350,7 +351,8 @@ public class DataHandler {
 	 */	
 	private void checklist(String[] x){
 		try{
-			if(results.getString(x[0]).equals("Y") && x[1] == null){
+			String id = results.getString("ID");
+			if(results.getString(x[0]).equals("Y") && x[1] == null && !usedIds.contains(id)){
 				x[1] = "Y";
 				//only want to add cost to totalCost once for each row
 				if(count == 0){

@@ -146,27 +146,30 @@ public class IO{
         Scanner in = new Scanner(System.in);
         while(true){
             System.out.println("Please select a appropriate type from the category chosen: ");
-            System.out.println("Chair types => Task, Mesh, Kneeling, Executive, Ergonomic");
-            System.out.println("Desk types => Traditional, Adjustable, Standing");
-            System.out.println("Filing types => Small, Medium, Large");
-            System.out.println("Lamp types => Desk, Swing Arm, Study");
-            type = in.nextLine();
             if(category.equals("chair")){
+                System.out.println("Chair types => Task, Mesh, Kneeling, Executive, Ergonomic");
+                type = in.nextLine();
                 if(type.equals("Task") || type.equals("Mesh") || type.equals("Kneeling") || type.equals("Executive") || type.equals("Ergonomic")){
                     break;
                 }
             }
             else if(category.equals("desk")){
+                System.out.println("Desk types => Traditional, Adjustable, Standing");
+                type = in.nextLine();
                 if(type.equals("Traditional") || type.equals("Adjustable") || type.equals("Standing")){
                     break;
                 }
             }
             else if(category.equals("filing")){
+                System.out.println("Filing types => Small, Medium, Large");
+                type = in.nextLine();
                 if(type.equals("Small") || type.equals("Medium") || type.equals("Large")){
                     break;
                 }
             }
             else if(category.equals("lamp")){
+                System.out.println("Lamp types => Desk, Swing Arm, Study");
+                type = in.nextLine();
                 if(type.equals("Desk") || type.equals("Swing Arm") || type.equals("Study")){
                     break;
                 }

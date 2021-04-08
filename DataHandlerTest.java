@@ -37,97 +37,98 @@ public class DataHandlerTest {
 		// Will initialize
 	}
 	
-	/** 2
-     * Calculate cheapest option for requested pieces
-	 */
-	@Test
-	public void test_calcCheap() {
-		String furnCat = "chair";
-		String type = "Task";
-		int items = 1;
-		DataHandler d = new DataHandler(furnCat, type, items);
-		boolean combFound;
-		combFound = d.findCombo(); //Finding If A Combination Exists (Method)
+	// /** 2
+    //  * Calculate cheapest option for requested pieces
+	//  */
+	// @Test
+	// public void test_calcCheap() {
+	// 	String furnCat = "chair";
+	// 	String type = "Task";
+	// 	int items = 1;
+	// 	DataHandler d = new DataHandler(furnCat, type, items);
+	// 	boolean combFound;
+	// 	combFound = d.findCombo(); //Finding If A Combination Exists (Method)
 		
-		ArrayList<ArrayList<String>> allIds = new ArrayList<ArrayList<String>>();
-		ArrayList<Integer> allCosts = new ArrayList<Integer>(); 
+	// 	ArrayList<ArrayList<String>> allIds = new ArrayList<ArrayList<String>>();
+	// 	ArrayList<Integer> allCosts = new ArrayList<Integer>(); 
 		
-		allIds = d.getFinalIds(); 
-        allCosts = d.getFinalCost();
+	// 	allIds = d.getFinalIds(); 
+    //     allCosts = d.getFinalCost();
 		
-        // HOW TO TEST FOR CORRECT CHEAPEST OPTION****
-		assertEquals(true,combFound); //Should return TRUE if a combination is found
-		fail("The cheapest options were not calculated"); // If Failed 
-	}
+    //     // HOW TO TEST FOR CORRECT CHEAPEST OPTION****
+	// 	assertEquals(true,combFound); //Should return TRUE if a combination is found
+	// 	fail("The cheapest options were not calculated"); // If Failed 
+	// }
 	
-	/** 3
-     * A fullfiled request
-	 */
-	@Test
-	public void test_fulFill() {
-		String furnCat = "chair";
-		String type = "Task";
-		int items = 1;
-		DataHandler d = new DataHandler(furnCat, type, items);
-		boolean combFound;
-		combFound = d.findCombo(); //Finding If A Combination Exists (Method)
+	// /** 3
+    //  * A fullfiled request
+	//  */
+	// @Test
+	// public void test_fulFill() {
+	// 	String furnCat = "chair";
+	// 	String type = "Task";
+	// 	int items = 1;
+	// 	DataHandler d = new DataHandler(furnCat, type, items);
+	// 	boolean combFound;
+	// 	combFound = d.findCombo(); //Finding If A Combination Exists (Method)
 		
-		ArrayList<ArrayList<String>> allIds = new ArrayList<ArrayList<String>>();
-		ArrayList<Integer> allCosts = new ArrayList<Integer>(); 
+	// 	ArrayList<ArrayList<String>> allIds = new ArrayList<ArrayList<String>>();
+	// 	ArrayList<Integer> allCosts = new ArrayList<Integer>(); 
 		
-		allIds = d.getFinalIds(); 
-        allCosts = d.getFinalCost();
+	// 	allIds = d.getFinalIds(); 
+    //     allCosts = d.getFinalCost();
 		
-        IO i = new IO();
-        // make answer true?
-        boolean answer = i.checkWithUser(); // CHECKING IF USER IS OKAY WITH THE COMBINATIONS
+    //     IO i = new IO();
+    //     // make answer true?
+    //     boolean answer = i.checkWithUser(); // CHECKING IF USER IS OKAY WITH THE COMBINATIONS
         
-        assertEquals(true,answer); // ANSWER WILL RETURN TRUE IF CUSTOMER IS HAPPY
+    //     assertEquals(true,answer); // ANSWER WILL RETURN TRUE IF CUSTOMER IS HAPPY
        
-        // ASSERTEQUALS FILE ORDER
-		fail("Requests has not been fullfilled"); // If Failed
-	}
+    //     // ASSERTEQUALS FILE ORDER
+	// 	fail("Requests has not been fullfilled"); // If Failed
+	// }
 	
-	/** 4
-     * updated base when an order form is produced, to account for items no longer available
-	 */
-	@Test
-	public void test_updateInventory() {
-		// UPDATE - N AND J WILL FINISH THAT METHOD I BELIEVE
-		String furnCat = "chair";
-		String type = "Task";
-		int items = 1;
-		DataHandler d = new DataHandler(furnCat, type, items);
+	// /** 4
+    //  * updated base when an order form is produced, to account for items no longer available
+	//  */
+	// @Test
+	// public void test_updateInventory() {
+	// 	// UPDATE - N AND J WILL FINISH THAT METHOD I BELIEVE
+	// 	String furnCat = "chair";
+	// 	String type = "Task";
+	// 	int items = 1;
+	// 	DataHandler d = new DataHandler(furnCat, type, items);
 		
-		fail("Inventory was not updated"); // If Failed
-	}
+	// 	fail("Inventory was not updated"); // If Failed
+	// }
 	
-	/** 5
-     * test for when requests cannot be fullfilled
-	 */
-	@Test
-	public void test_Input() {
-		String furnCat = "chair";
-		String type = "Task";
-		int items = 99;
-		DataHandler d = new DataHandler(furnCat, type, items);
-		boolean combFound;
-		combFound = d.findCombo(); //Finding If A Combination Exists (Method)
+	// /** 5
+    //  * test for when requests cannot be fullfilled
+	//  */
+	// @Test
+	// public void test_Input() {
+	// 	String furnCat = "chair";
+	// 	String type = "Task";
+	// 	int items = 99;
+	// 	DataHandler d = new DataHandler(furnCat, type, items);
+	// 	boolean combFound;
+	// 	combFound = d.findCombo(); //Finding If A Combination Exists (Method)
 		
-		ArrayList<ArrayList<String>> allIds = new ArrayList<ArrayList<String>>();
-		ArrayList<Integer> allCosts = new ArrayList<Integer>(); 
+	// 	ArrayList<ArrayList<String>> allIds = new ArrayList<ArrayList<String>>();
+	// 	ArrayList<Integer> allCosts = new ArrayList<Integer>(); 
 		
-		allIds = d.getFinalIds(); 
-        allCosts = d.getFinalCost(); // No Final Cost
+	// 	allIds = d.getFinalIds(); 
+    //     allCosts = d.getFinalCost(); // No Final Cost
 		
-        IO i = new IO();
-        boolean answer = i.checkWithUser(); // CHECKING IF USER IS OKAY WITH THE COMBINATIONS
+    //     IO i = new IO();
+    //     boolean answer = i.checkWithUser(); // CHECKING IF USER IS OKAY WITH THE COMBINATIONS
         
-        d.printRecommedations(); //RECCOMENDATIONS WILL BE PRINTED
-        assertEquals(false,combFound); //WE WILL NOT FIND COMBINATIONS
+    //     d.printRecommedations(); //RECCOMENDATIONS WILL BE PRINTED
+    //     assertEquals(false,combFound); //WE WILL NOT FIND COMBINATIONS
 		
-		fail("Recommendations were not given"); // If Failed
-	}
+	// 	fail("Recommendations were not given"); // If Failed
+	// }
 	
 	//Tests for main methods
+	
 }

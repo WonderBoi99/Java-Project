@@ -4,12 +4,13 @@ Faculty Name:
 Contact: 
 Date: 
 
-Original Request: Task chair, 1
+Original Request: Adjustable desk, 2
 
 Items Ordered:
-A1111
-A2222
-A3333
-A4444
+D3682
+D5437
+D1030
+D4475
+D2746
 
-Total Price: $200
+Total Price: $700
