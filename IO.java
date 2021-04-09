@@ -126,7 +126,7 @@ public class IO{
         System.out.println();
         askForType();
         System.out.println();
-        System.out.println("Please specific the amount you would like: ");
+        System.out.println("Please specify the amount you would like (an integer): ");
         amount = in.nextInt();
         System.out.println("-----------------------");
     }

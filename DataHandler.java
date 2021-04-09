@@ -397,7 +397,7 @@ public class DataHandler {
 			}
 			//formatting stuff
 			if(suggestions.length() == 0){
-				printAllManufacturers();
+				System.out.println("No manufacturers provide this item");
 			}
 			else{
 				suggestions.setLength(suggestions.length()-2);
@@ -406,27 +406,6 @@ public class DataHandler {
 			}
 			myStatement.close();
 			mySecondStatment.close();
-		}
-		catch(SQLException e){
-			e.printStackTrace();    		
-		}
-	}
-
-	/**
-	 * Prints out all of the manufacturers names avaiable
-	 */
-	private void printAllManufacturers(){
-		try{
-			StringBuilder suggestions = new StringBuilder();
-			Statement myStat = connect.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			results = myStat.executeQuery("SELECT * FROM manufacturer");
-			while(results.next()){
-				suggestions = suggestions.append(results.getString("Name") + ", ");
-			}
-			suggestions.setLength(suggestions.length()-2);
-			System.out.println("Order cannot be fulfilled. Suggested manufacturer(s) are: ");
-			System.out.println(suggestions.toString());
-			myStat.close();
 		}
 		catch(SQLException e){
 			e.printStackTrace();    		
