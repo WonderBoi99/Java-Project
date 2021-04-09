@@ -26,8 +26,9 @@ public class DataHandler {
 	
 	public final String DBURL = "jdbc:mysql://localhost/inventory"; //store the database url information
     public final String USERNAME = "scm";	//store the user's account username
+	//scm
     public final String PASSWORD =  "ensf409";	//store the user's account password
-
+	//ensf409
     private Connection connect; //connection
     private ResultSet results;	//results of query
 
@@ -49,7 +50,11 @@ public class DataHandler {
 	//stores the total cost of each combination in finalIds
 	private ArrayList<String> usedIds = new ArrayList<String>();
 	//stores all the Ids that have been used
-	
+	private ArrayList<ArrayList<String>> allPossibleCombinations = new ArrayList<ArrayList<String>>();
+	//stores all possible valid combinations
+	private ArrayList<Integer> allCosts = new ArrayList<Integer>();
+	//stores all possible valid costs
+
 	/**
 	 * When code is run
 	 * Program will ask for user input of category, type and amount separately
@@ -191,15 +196,55 @@ public class DataHandler {
 				}
     			combMade = lookForOneCombination();
 				if(combMade){ //if valid and not already used
+					// System.out.println(newID);
 					mainStrategy();
+					System.out.println("allPossibleCombinations: " + allPossibleCombinations);
+					System.out.println("allCosts: " + allCosts);
 					updateUsedIds();
 				}
 				resetVariables();
+
+				//for spot 1
+					//for spot 2
+						//for spot 3
+							//for spot 4
+								//is this combination valid?
+									//if yes, add to valid combinations
 			}
     		myStatement.close(); //close statement very important
-			if(finalIds.size() == inputAmount){
-				orderFilled = true;
+			System.out.println(allPossibleCombinations);
+			while (allPossibleCombinations.size() > 0) {
+				int minIndex = allCosts.indexOf(Collections.min(allCosts));
+				boolean duplicate = false;
+				for (String id : allPossibleCombinations.get(minIndex)) {
+					for (ArrayList<String> comboFinal : finalIds) {
+						if (comboFinal.contains(id)) {
+							// System.out.println("DUPLICATE");
+							duplicate = true;
+						}
+					}
+				}
+				// System.out.println("finalIds: " + finalIds);
+				if (!duplicate) {
+					// System.out.println("ADDING: " + allPossibleCombinations.get(minIndex) + " " + Collections.min(allCosts));
+					finalIds.add(new ArrayList <String>(allPossibleCombinations.get(minIndex)));
+					finalCost.add(Collections.min(allCosts));
+				}
+				// System.out.println("allCosts: " + allCosts);
+				// System.out.println("allPossibleCombinations: " + allPossibleCombinations );
+				// System.out.println("REMOVING: " + allPossibleCombinations.get(minIndex) + " " + Collections.min(allCosts));
+				allPossibleCombinations.remove(allPossibleCombinations.get(minIndex));
+				allCosts.remove(minIndex);
+				if (finalIds.size() == inputAmount) {
+					return true;
+				}
 			}
+			// if(finalIds.size() == inputAmount){
+			// 	orderFilled = true;
+			// }
+			// System.out.println("finalIds: " + finalIds);
+			// System.out.println("final cost: " + finalCost);
+				
     	}
     	catch(SQLException e){
     		e.printStackTrace();    		
@@ -211,23 +256,71 @@ public class DataHandler {
 	 * determines if the most recent valid combination should be stored
 	 */
 	private void mainStrategy(){
-		if(finalCost.size() < inputAmount){ //if not enough combinations made, then always store
-			finalCost.add(totalCost);
-			finalIds.add(new ArrayList <String>(newID));
+		// System.out.println("mainStrategy");
+		// int mostExpensiveDuplicate = 0;
+		// int indexToRemove = -1;
+		// System.out.println("newId: " + newID);
+		// System.out.println("totalCost: " + totalCost);
+
+		if (allPossibleCombinations.size() == 0) {
+			allPossibleCombinations.add(new ArrayList <String>(newID));
+			allCosts.add(totalCost);
 		}
-		else if(totalCost < Collections.max(finalCost)){ 
-			//if new combination cheaper than current most expensive combination
-			int index = finalCost.indexOf(Collections.max(finalCost));
-			//get index of most expensive combination
-			finalCost.remove(index);
-			//remove index from cost
-			finalIds.remove(index);
-			//remove index from finalIds
-			finalCost.add(totalCost);
-			//add new combination cost
-			finalIds.add(new ArrayList <String>(newID));
-			//add new combination Ids
+		else {
+			if (!allPossibleCombinations.contains(newID)) {
+					allPossibleCombinations.add(new ArrayList <String>(newID));
+					allCosts.add(totalCost);
+			}
 		}
+		
+		// for (ArrayList <String> finalCombo : finalIds) {
+		// 	for (String Id : newID) {
+		// 		if (finalCombo.contains(Id)) {
+		// 			System.out.println("I AM A DUPLICATE ++++++++++++++++");
+		// 			System.out.println("id: " + Id);
+		// 			System.out.println("finalCombo: " + finalCombo);
+		// 			System.out.println("totalCost: " + totalCost);
+		// 			System.out.println("finalCost: " + finalCost);
+		// 			System.out.println("finalIds: " + finalIds);
+		// 			int tempIndex = finalIds.indexOf(finalCombo);
+		// 			System.out.println("tempIndex: " + tempIndex);
+		// 			int tempCost = finalCost.get(tempIndex);
+		// 			if (tempCost > totalCost && tempCost > mostExpensiveDuplicate) {
+		// 				mostExpensiveDuplicate = tempCost;
+		// 				indexToRemove = tempIndex;
+		// 				System.out.println("I AM CHEAPER");
+		// 				System.out.println("tempCost: " + tempCost);
+		// 				System.out.println("tempIndex: " + tempIndex);
+		// 				System.out.println("indexToRemove: " + indexToRemove);
+		// 			}
+		// 		}
+		// 	}
+		// }
+		// System.out.println("indexToRemove: " + indexToRemove);
+		// if(finalCost.size() == 0){ //if not enough combinations made, then always store
+		// 	System.out.println("NOT FULL");
+		// 	finalCost.add(totalCost);
+		// 	finalIds.add(new ArrayList <String>(newID));
+		// }
+
+		// else if(totalCost < Collections.max(finalCost) && !finalIds.contains(newID)){ 
+		// 	//if new combination cheaper than current most expensive combination
+		// 	int index = finalCost.indexOf(Collections.max(finalCost));
+		// 	if (indexToRemove != -1) {
+		// 		index = indexToRemove;
+		// 	}
+		// 	//get index of most expensive combination
+		// 	System.out.println("REMOVING: " + finalCost.get(index) + " " + finalIds.get(index) + "----------------------------------------");
+		// 	System.out.println("ADDING: " + totalCost + " " + newID + "----------------------------------------");
+		// 	finalCost.remove(index);
+		// 	//remove index from cost
+		// 	finalIds.remove(index);
+		// 	//remove index from finalIds
+		// 	finalCost.add(totalCost);
+		// 	//add new combination cost
+		// 	finalIds.add(new ArrayList <String>(newID));
+		// 	//add new combination Ids
+		// }
 	}
 
 	/**
@@ -261,7 +354,7 @@ public class DataHandler {
 	/**
 	 * updates usedIds with all the Ids that have be selected as a temp combination from finalIds
 	 */
-	void updateUsedIds(){
+	private void updateUsedIds(){
 		usedIds.clear();
 		for(int o = 0; o < finalIds.size(); o++){
 			ArrayList<String> tmp = finalIds.get(o);
@@ -298,11 +391,18 @@ public class DataHandler {
 		checklist(a2);
 		checklist(a3);
 		checklist(a4);
-		if(a1[1] != null && a2[1] != null && a3[1] != null && a4[1] != null){
-			tmp = true;
-		}
-		else{
-			tmp = false;
+		//we need to store each startingID info
+		//for loop
+			//skipping
+			//looking for combination with startingID
+			//store valid combo and cost somewhere if all checklists work
+		for (int i = 0; i < 100; i++) {
+			if(a1[1] != null && a2[1] != null && a3[1] != null && a4[1] != null){
+				tmp = true;
+			}
+			else{
+				tmp = false;
+			}
 		}
 		return tmp;
 	}
@@ -367,13 +467,15 @@ public class DataHandler {
 	private void checklist(String[] x){
 		try{
 			String id = results.getString("ID");
-			if(results.getString(x[0]).equals("Y") && x[1] == null && !usedIds.contains(id)){
+			if(results.getString(x[0]).equals("Y") && x[1] == null){ //&& !usedIds.contains(id)){
 				x[1] = "Y";
 				//only want to add cost to totalCost once for each row
 				if(count == 0){
 					totalCost = totalCost + results.getInt("Price");
 					//recording the IDs
+					// System.out.println("Adding to newID: " + results.getString("ID"));
 					newID.add(results.getString("ID"));
+					// System.out.println("newID: " + newID);
 					count++;
 				}
 			}
