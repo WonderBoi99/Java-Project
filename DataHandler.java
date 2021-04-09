@@ -7,13 +7,15 @@
  *@version 12
  *@since 11
 */
-package edu.ucalgary.ensf409;
+// package edu.ucalgary.ensf409;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.lang.StringBuilder;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.Integer;
 
 /**
@@ -76,7 +78,21 @@ public class DataHandler {
     	inputType = type;
     	inputAmount = amount;
     }
-
+    
+    public String getInputCategory() {
+    	// returns input Category
+    	return inputCategory;
+    }
+    
+    public String getInputType() {
+    	// returns input Type
+    	return inputType;
+    }
+    
+    public int getInputAmount() {
+    	// returns input Type
+    	return inputAmount;
+    }
 	public ArrayList<ArrayList<String>> getFinalIds(){
 		//returns finalIds
 		return finalIds;
@@ -245,7 +261,7 @@ public class DataHandler {
 	/**
 	 * updates usedIds with all the Ids that have be selected as a temp combination from finalIds
 	 */
-	private void updateUsedIds(){
+	void updateUsedIds(){
 		usedIds.clear();
 		for(int o = 0; o < finalIds.size(); o++){
 			ArrayList<String> tmp = finalIds.get(o);
@@ -411,4 +427,33 @@ public class DataHandler {
 			e.printStackTrace();    		
 		}
 	}
+	
+	/**
+	 * Makes a orderform.txt file with some information  
+	 * Following the specified format of the given example
+	 */	
+	public void makeFile(){
+		try{   
+            FileWriter output;
+			//the output FileWriter will output to a text file called "output.txt"			
+			output = new FileWriter("orderform.txt", false); //the second parameter of false tells it to overwrite an existing file of that name if it exists
+			output.write("Furniture Order Form\n\n");
+			output.write("Faculty Name: \n");
+			output.write("Contact: \n");
+			output.write("Date: \n\n");
+			output.write("Original Request: "+inputType+" "+inputCategory+", "+inputAmount+"\n\n");
+			output.write("Items Ordered:\n");
+            for(int o = 0; o < finalIds.size(); o++){
+                ArrayList<String> tmp = finalIds.get(o);
+                for(int i = 0; i < tmp.size(); i++){
+                    output.write(tmp.get(i)+"\n");
+                }
+            }
+			output.write("\nTotal Price: $" + sumOfCosts());
+            output.close();
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+	}	
 }

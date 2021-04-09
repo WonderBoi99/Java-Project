@@ -7,7 +7,7 @@
  *@version 12
  *@since 11
 */
-package edu.ucalgary.ensf409;
+// package edu.ucalgary.ensf409;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -65,7 +65,7 @@ public class IO{
             {
                 //dataHandler.makeTxtFile;
                 System.out.println("Text file made");
-                makeFile();
+                test.makeFile();
                 test.deleteUsedIds();
                 test.close();
                 System.exit(1);
@@ -83,7 +83,7 @@ public class IO{
      * If user says yes, then a orderform.txt file will be made and the UsedIds will be deleted from the database
      * If user says no, then recommendations of manufacturers will be displayed 
      */
-    private boolean checkWithUser(){
+    boolean checkWithUser(){
         String answer;
         boolean tmp = false;
         Scanner in = new Scanner(System.in);
@@ -185,35 +185,6 @@ public class IO{
             System.out.println("Spelling mistake or "+type+" is not a type in "+category+" category");
         }
     }
-    
-	/**
-	 * Makes a orderform.txt file with some information  
-	 * Following the specified format of the given example
-	 */	
-	public void makeFile(){
-		try{   
-            FileWriter output;
-			//the output FileWriter will output to a text file called "output.txt"			
-			output = new FileWriter("orderform.txt", false); //the second parameter of false tells it to overwrite an existing file of that name if it exists
-			output.write("Furniture Order Form\n\n");
-			output.write("Faculty Name: \n");
-			output.write("Contact: \n");
-			output.write("Date: \n\n");
-			output.write("Original Request: "+type+" "+category+", "+amount+"\n\n");
-			output.write("Items Ordered:\n");
-            for(int o = 0; o < allIds.size(); o++){
-                ArrayList<String> tmp = allIds.get(o);
-                for(int i = 0; i < tmp.size(); i++){
-                    output.write(tmp.get(i)+"\n");
-                }
-            }
-			output.write("\nTotal Price: $" + sum);
-            output.close();
-		}
-		catch(IOException e){
-			e.printStackTrace();
-		}
-	}	
 }
 
 
