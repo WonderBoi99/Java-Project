@@ -25,7 +25,7 @@ It handles interaction with the database and calculation of recommendations
 public class DataHandler {
 	
 	public final String DBURL = "jdbc:mysql://localhost/inventory"; //store the database url information
-    public final String USERNAME = "scm";	//store the user's account username
+    public final String USERNAME = "naikar";	//store the user's account username
 	//scm
     public final String PASSWORD =  "ensf409";	//store the user's account password
 	//ensf409
@@ -54,6 +54,8 @@ public class DataHandler {
 	//stores all possible valid combinations
 	private ArrayList<Integer> allCosts = new ArrayList<Integer>();
 	//stores all possible valid costs
+	private int numberOfRows;
+	//private int whereAreWe;
 
 	/**
 	 * When code is run
@@ -183,68 +185,36 @@ public class DataHandler {
 			//statement for getting the number of rows in table
     		results = myStatement.executeQuery("SELECT count(ID) FROM " + inputCategory);
 			results.next();
-			int numberOfRows = results.getInt(1);
+			numberOfRows = results.getInt(1);
 			//statement for getting and putting the data from user picked table in ascending order depending on Price
     		results = myStatement.executeQuery("SELECT * FROM " + inputCategory + " ORDER BY Price ASC");
-			for(int start = 0; start < numberOfRows;start++){
-				int counting = 0;
-				boolean combMade = false;
-				//for skipping rows
-				while(counting < start){
-					results.next();
-					counting++;
-				}
-    			combMade = lookForOneCombination();
-				if(combMade){ //if valid and not already used
-					// System.out.println(newID);
-					mainStrategy();
-					System.out.println("allPossibleCombinations: " + allPossibleCombinations);
-					System.out.println("allCosts: " + allCosts);
-					updateUsedIds();
-				}
-				resetVariables();
-
-				//for spot 1
-					//for spot 2
-						//for spot 3
-							//for spot 4
-								//is this combination valid?
-									//if yes, add to valid combinations
-			}
+			
+			boolean combMade = false;
+			
+    		combMade = lookForOneCombination();
+			
     		myStatement.close(); //close statement very important
-			System.out.println(allPossibleCombinations);
+			//System.out.println(allPossibleCombinations);
 			while (allPossibleCombinations.size() > 0) {
 				int minIndex = allCosts.indexOf(Collections.min(allCosts));
 				boolean duplicate = false;
 				for (String id : allPossibleCombinations.get(minIndex)) {
 					for (ArrayList<String> comboFinal : finalIds) {
 						if (comboFinal.contains(id)) {
-							// System.out.println("DUPLICATE");
 							duplicate = true;
 						}
 					}
 				}
-				// System.out.println("finalIds: " + finalIds);
 				if (!duplicate) {
-					// System.out.println("ADDING: " + allPossibleCombinations.get(minIndex) + " " + Collections.min(allCosts));
 					finalIds.add(new ArrayList <String>(allPossibleCombinations.get(minIndex)));
 					finalCost.add(Collections.min(allCosts));
 				}
-				// System.out.println("allCosts: " + allCosts);
-				// System.out.println("allPossibleCombinations: " + allPossibleCombinations );
-				// System.out.println("REMOVING: " + allPossibleCombinations.get(minIndex) + " " + Collections.min(allCosts));
 				allPossibleCombinations.remove(allPossibleCombinations.get(minIndex));
 				allCosts.remove(minIndex);
 				if (finalIds.size() == inputAmount) {
 					return true;
 				}
-			}
-			// if(finalIds.size() == inputAmount){
-			// 	orderFilled = true;
-			// }
-			// System.out.println("finalIds: " + finalIds);
-			// System.out.println("final cost: " + finalCost);
-				
+			}				
     	}
     	catch(SQLException e){
     		e.printStackTrace();    		
@@ -256,12 +226,6 @@ public class DataHandler {
 	 * determines if the most recent valid combination should be stored
 	 */
 	private void mainStrategy(){
-		// System.out.println("mainStrategy");
-		// int mostExpensiveDuplicate = 0;
-		// int indexToRemove = -1;
-		// System.out.println("newId: " + newID);
-		// System.out.println("totalCost: " + totalCost);
-
 		if (allPossibleCombinations.size() == 0) {
 			allPossibleCombinations.add(new ArrayList <String>(newID));
 			allCosts.add(totalCost);
@@ -272,74 +236,26 @@ public class DataHandler {
 					allCosts.add(totalCost);
 			}
 		}
-		
-		// for (ArrayList <String> finalCombo : finalIds) {
-		// 	for (String Id : newID) {
-		// 		if (finalCombo.contains(Id)) {
-		// 			System.out.println("I AM A DUPLICATE ++++++++++++++++");
-		// 			System.out.println("id: " + Id);
-		// 			System.out.println("finalCombo: " + finalCombo);
-		// 			System.out.println("totalCost: " + totalCost);
-		// 			System.out.println("finalCost: " + finalCost);
-		// 			System.out.println("finalIds: " + finalIds);
-		// 			int tempIndex = finalIds.indexOf(finalCombo);
-		// 			System.out.println("tempIndex: " + tempIndex);
-		// 			int tempCost = finalCost.get(tempIndex);
-		// 			if (tempCost > totalCost && tempCost > mostExpensiveDuplicate) {
-		// 				mostExpensiveDuplicate = tempCost;
-		// 				indexToRemove = tempIndex;
-		// 				System.out.println("I AM CHEAPER");
-		// 				System.out.println("tempCost: " + tempCost);
-		// 				System.out.println("tempIndex: " + tempIndex);
-		// 				System.out.println("indexToRemove: " + indexToRemove);
-		// 			}
-		// 		}
-		// 	}
-		// }
-		// System.out.println("indexToRemove: " + indexToRemove);
-		// if(finalCost.size() == 0){ //if not enough combinations made, then always store
-		// 	System.out.println("NOT FULL");
-		// 	finalCost.add(totalCost);
-		// 	finalIds.add(new ArrayList <String>(newID));
-		// }
-
-		// else if(totalCost < Collections.max(finalCost) && !finalIds.contains(newID)){ 
-		// 	//if new combination cheaper than current most expensive combination
-		// 	int index = finalCost.indexOf(Collections.max(finalCost));
-		// 	if (indexToRemove != -1) {
-		// 		index = indexToRemove;
-		// 	}
-		// 	//get index of most expensive combination
-		// 	System.out.println("REMOVING: " + finalCost.get(index) + " " + finalIds.get(index) + "----------------------------------------");
-		// 	System.out.println("ADDING: " + totalCost + " " + newID + "----------------------------------------");
-		// 	finalCost.remove(index);
-		// 	//remove index from cost
-		// 	finalIds.remove(index);
-		// 	//remove index from finalIds
-		// 	finalCost.add(totalCost);
-		// 	//add new combination cost
-		// 	finalIds.add(new ArrayList <String>(newID));
-		// 	//add new combination Ids
-		// }
 	}
 
 	/**
 	 * finds a single valid combination
 	 */
 	private boolean lookForOneCombination(){
+		
 		boolean tmp = false;
 		try{
 			while (results.next()){
 				String temp = results.getString("Type");
 				if(temp.equals(inputType)){
 					if(checkList == 4){	
-						tmp = checklistForChair();
+						checklistForChair();
 					}
 					else if(checkList == 3){
-						tmp = checklistForDeskOrFiling();
+						checklistForDeskOrFiling();
 					}
 					else if(checkList == 2){
-						tmp = checklistForLamp();
+						checklistForLamp();
 					}	
 				}
 				count = 0;     
@@ -348,32 +264,19 @@ public class DataHandler {
 		catch(SQLException e){
     		e.printStackTrace();    		
     	}
-		return tmp;
-	}
-
-	/**
-	 * updates usedIds with all the Ids that have be selected as a temp combination from finalIds
-	 */
-	private void updateUsedIds(){
-		usedIds.clear();
-		for(int o = 0; o < finalIds.size(); o++){
-			ArrayList<String> tmp = finalIds.get(o);
-			for(int i = 0; i < tmp.size(); i++){
-				usedIds.add(tmp.get(i));
-			}
+		if(allPossibleCombinations.size() >= inputAmount){
+			return true;
 		}
+		
+		return false;
+		
+		
 	}
 
 	/**
 	 * resets attributes to base state
 	 */
 	private void resetVariables(){
-		a1[1] = null;
-		a2[1] = null;
-		a3[1] = null;
-		a4[1] = null;
-		totalCost = 0;
-		newID.clear();
 		try{
 			results.beforeFirst();
 		}
@@ -385,59 +288,226 @@ public class DataHandler {
 	/**
 	 * sets up a validity check for each column for the chair type
 	 */
-	private boolean checklistForChair(){
-		boolean tmp = false;
-		checklist(a1);
-		checklist(a2);
-		checklist(a3);
-		checklist(a4);
-		//we need to store each startingID info
-		//for loop
-			//skipping
-			//looking for combination with startingID
-			//store valid combo and cost somewhere if all checklists work
-		for (int i = 0; i < 100; i++) {
-			if(a1[1] != null && a2[1] != null && a3[1] != null && a4[1] != null){
-				tmp = true;
+	private void checklistForChair(){
+		//ArrayList<String> tempIds = new ArrayList<String>();
+		//ArrayList<String> tempCost = new ArrayList<String>();
+		try{
+			count = 0;
+			boolean tmp = false;
+			boolean combMade = false;
+			int startingPoint;
+			if(a1[1] == null && a2[1] == null && a3[1] == null && a4[1] == null){
+				startingPoint = results.getRow();
+				checklist(a1);
+				checklist(a2);
+				checklist(a3);
+				checklist(a4);
+				results.beforeFirst();
+				for(int index = 0; index < numberOfRows; index++){
+					int counting = 0;
+					//for skipping rows
+					while(counting < index){
+						results.next();
+						counting++;
+					}
+					while (results.next()){
+						String temp = results.getString("Type");
+						if(temp.equals(inputType)){
+							if(checkList == 4){	
+								
+								checklistForChair();
+							}
+							else if(checkList == 3){
+								checklistForDeskOrFiling();
+							}
+							else if(checkList == 2){
+								checklistForLamp();
+							}	
+						}
+						count = 0;  
+						if(a1[1] != null && a2[1] != null && a3[1] != null && a4[1] != null){
+							combMade = true;
+							mainStrategy(); 
+							break;
+						}   
+					}
+					newID.clear();
+					totalCost = 0;
+					a1[1] = null;
+					a2[1] = null;
+					a3[1] = null;
+					a4[1] = null;
+					results.absolute(startingPoint);
+					checklist(a1);
+					checklist(a2);
+					checklist(a3);
+					checklist(a4);
+					results.beforeFirst();
+					combMade = false;
+					
+				}
+				newID.clear();
+				totalCost = 0;
+				a1[1] = null;
+				a2[1] = null;
+				a3[1] = null;
+				a4[1] = null;
+				results.absolute(startingPoint);
 			}
 			else{
-				tmp = false;
+				checklist(a1);
+				checklist(a2);
+				checklist(a3);
+				checklist(a4);
+				count = 0;
 			}
 		}
-		return tmp;
+		catch(SQLException e){
+    		e.printStackTrace();    		
+    	}
 	}
 
 	/**
 	 * sets up a validity check for each column for the desk or filing types
 	 */
-	private boolean checklistForDeskOrFiling(){
-		boolean tmp = false;
-		checklist(a1);
-		checklist(a2);
-		checklist(a3);
-		if(a1[1] != null && a2[1] != null && a3[1] != null){
-			tmp = true;
+	private void checklistForDeskOrFiling(){
+		try{
+			count = 0;
+			boolean tmp = false;
+			boolean combMade = false;
+			int startingPoint;
+			if(a1[1] == null && a2[1] == null && a3[1] == null){
+				startingPoint = results.getRow();
+				checklist(a1);
+				checklist(a2);
+				checklist(a3);
+				results.beforeFirst();
+				for(int index = 0; index < numberOfRows; index++){
+					int counting = 0;
+					//for skipping rows
+					while(counting < index){
+						results.next();
+						counting++;
+					}
+					while (results.next()){
+						String temp = results.getString("Type");
+						if(temp.equals(inputType)){
+							if(checkList == 4){	
+								checklistForChair();
+							}
+							else if(checkList == 3){
+								checklistForDeskOrFiling();
+							}
+							else if(checkList == 2){
+								checklistForLamp();
+							}	
+						}
+						count = 0;  
+						if(a1[1] != null && a2[1] != null && a3[1] != null){
+							combMade = true;
+							mainStrategy(); 
+							break;
+						}   
+					}
+					newID.clear();
+					totalCost = 0;
+					a1[1] = null;
+					a2[1] = null;
+					a3[1] = null;
+					results.absolute(startingPoint);
+					checklist(a1);
+					checklist(a2);
+					checklist(a3);
+					results.beforeFirst();
+					combMade = false;
+					
+				}
+				newID.clear();
+				totalCost = 0;
+				a1[1] = null;
+				a2[1] = null;
+				a3[1] = null;
+				results.absolute(startingPoint);
+			}
+			else{
+				checklist(a1);
+				checklist(a2);
+				checklist(a3);
+				count = 0;
+			}
 		}
-		else{
-			tmp = false;
-		}
-		return tmp;
+		catch(SQLException e){
+    		e.printStackTrace();    		
+    	}
 	}
 
 	/**
 	 * sets up a validity check for each column for the lamp type
 	 */
-	private boolean checklistForLamp(){
-		boolean tmp = false;
-		checklist(a1);
-		checklist(a2);
-		if(a1[1] != null && a2[1] != null){
-			tmp = true;
+	private void checklistForLamp(){
+		try{
+			count = 0;
+			boolean tmp = false;
+			boolean combMade = false;
+			int startingPoint;
+			if(a1[1] == null && a2[1] == null){
+				startingPoint = results.getRow();
+				checklist(a1);
+				checklist(a2);
+				results.beforeFirst();
+				for(int index = 0; index < numberOfRows; index++){
+					int counting = 0;
+					//for skipping rows
+					while(counting < index){
+						results.next();
+						counting++;
+					}
+					while (results.next()){
+						String temp = results.getString("Type");
+						if(temp.equals(inputType)){
+							if(checkList == 4){	
+								checklistForChair();
+							}
+							else if(checkList == 3){
+								checklistForDeskOrFiling();
+							}
+							else if(checkList == 2){
+								checklistForLamp();
+							}	
+						}
+						count = 0;  
+						if(a1[1] != null && a2[1] != null){
+							combMade = true;
+							mainStrategy(); 
+							break;
+						}   
+					}
+					newID.clear();
+					totalCost = 0;
+					a1[1] = null;
+					a2[1] = null;
+					results.absolute(startingPoint);
+					checklist(a1);
+					checklist(a2);
+					results.beforeFirst();
+					combMade = false;
+					
+				}
+				newID.clear();
+				totalCost = 0;
+				a1[1] = null;
+				a2[1] = null;
+				results.absolute(startingPoint);
+			}
+			else{
+				checklist(a1);
+				checklist(a2);
+				count = 0;
+			}
 		}
-		else{
-			tmp = false;
-		}
-		return tmp;
+		catch(SQLException e){
+    		e.printStackTrace();    		
+    	}
 	}
 
 	/**
