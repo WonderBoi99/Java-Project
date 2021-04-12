@@ -7,7 +7,7 @@
  *@version 12
  *@since 11
 */
-// package edu.ucalgary.ensf409;
+package edu.ucalgary.ensf409;
 
 import java.sql.*;
 import java.util.ArrayList;
