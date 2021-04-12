@@ -483,9 +483,8 @@ public class DataHandler {
 			PreparedStatement mySecondStatment;
 			String qe;
 			//making prepared statement for getting all ManuID related to type
-			qe = "SELECT DISTINCT ManuID FROM "+ inputCategory + " WHERE Type = ?";
+			qe = "SELECT DISTINCT ManuID FROM "+ inputCategory;
 			mySecondStatment = connect.prepareStatement(qe);
-			mySecondStatment.setString(1, inputType);
 			results = mySecondStatment.executeQuery();
 			//storing the ManuID in manuIDs for later use
 			while(results.next()){
