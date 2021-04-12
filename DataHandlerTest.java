@@ -62,8 +62,8 @@ public class DataHandlerTest {
 		Statement myStatement = null;
 		// SELF NOTE: DEFAULTS
 		final String DBURL = "jdbc:mysql://localhost/inventory"; // store the database url information
-		final String USERNAME = "John"; // store the user's account username
-		final String PASSWORD = "password"; // store the user's account password
+		final String USERNAME = "scm"; // store the user's account username
+		final String PASSWORD = "ensf409"; // store the user's account password
 		try {
 			connect = DriverManager.getConnection(DBURL, USERNAME, PASSWORD);
 			myStatement = connect.createStatement();
@@ -104,8 +104,8 @@ public class DataHandlerTest {
 		Statement myStatement = null;
 		// SELF NOTE: DEFAULTS
 		final String DBURL = "jdbc:mysql://localhost/inventory"; // store the database url information
-		final String USERNAME ="John"; // store the user's account username
-		final String PASSWORD = "password"; // store the user's account password
+		final String USERNAME ="scm"; // store the user's account username
+		final String PASSWORD = "ensf409"; // store the user's account password
 		ArrayList<ArrayList<String>> finalIDs = new ArrayList<ArrayList<String>>();
 		try {
 			connect = DriverManager.getConnection(DBURL, USERNAME, PASSWORD);
@@ -147,8 +147,8 @@ public class DataHandlerTest {
 		Statement myStatement = null;
 		// SELF NOTE: DEFAULTS
 		final String DBURL = "jdbc:mysql://localhost/inventory"; // store the database url information
-		final String USERNAME = "John"; // store the user's account username
-		final String PASSWORD = "password"; // store the user's account password
+		final String USERNAME = "scm"; // store the user's account username
+		final String PASSWORD = "ensf409"; // store the user's account password
 		ResultSet rs = null;
 		try {
 			connect = DriverManager.getConnection(DBURL, USERNAME, PASSWORD);
