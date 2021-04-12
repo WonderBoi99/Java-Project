@@ -34,7 +34,9 @@ public class IO{
     private ArrayList<ArrayList<String>> allIds; //stores all the IDs used to fill order
 	private ArrayList<Integer> allCosts; //stores all the separate costs for different chosen combinations
 
-    //constructor
+    /**
+     * constructor
+     */
     public IO(){
         sum = 0;
         allIds = new ArrayList<ArrayList<String>>();
@@ -83,7 +85,7 @@ public class IO{
      * If user says yes, then a orderform.txt file will be made and the UsedIds will be deleted from the database
      * If user says no, then recommendations of manufacturers will be displayed 
      */
-    boolean checkWithUser(){
+    public boolean checkWithUser(){
         String answer;
         boolean tmp = false;
         Scanner in = new Scanner(System.in);

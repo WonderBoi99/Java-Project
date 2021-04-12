@@ -3,17 +3,25 @@
  * @author John Kvellestad, 10125207
  * @author Aashik Ilangovan, 30085993
  * @author Nikhil Naikar, 30039350
- * @version 1.4
+ * @version 2.0
  * @since 1.0 Unit Tests File
  */
-import static org.junit.Assert.*;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.io.File;
-import org.junit.Test;
+import java.util.ArrayList;
 import java.sql.*;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
+/**
+ * JUnit test file for the DataHandler program
+ * Uses both DataHandler.java and IO.java
+ * tests logic for found combinations and unfillable orders
+ * test functionality for user paths such as declining an order
+ * tests database insertion and deletion
+ */
 
 public class DataHandlerTest {
 	
@@ -39,6 +47,8 @@ public class DataHandlerTest {
 	/** TEST 2
 	 * Tests a Successfully Fulfilled Order, and produces a formatted order in a .txt format
 	 * Tests For The Output File being made, and its existence
+	 * Inserts its own record into the database to maintain integrity
+	 * Deletes its record at the end of the test
 	 */
 	@Test
 	public void testTextFileMade() {
@@ -52,13 +62,14 @@ public class DataHandlerTest {
 		Statement myStatement = null;
 		// SELF NOTE: DEFAULTS
 		final String DBURL = "jdbc:mysql://localhost/inventory"; // store the database url information
-		final String USERNAME = "scm"; // store the user's account username
-		final String PASSWORD = "ensf409"; // store the user's account password
+		final String USERNAME = "John"; // store the user's account username
+		final String PASSWORD = "password"; // store the user's account password
 		try {
 			connect = DriverManager.getConnection(DBURL, USERNAME, PASSWORD);
 			myStatement = connect.createStatement();
 			// Adding sql commands 
-			String sql = "INSERT INTO CHAIR (ID, Type, Legs, Arms, Seat, Cushion, Price, ManuID) VALUES ('A0000', 'Task', 'Y', 'Y', 'Y', 'Y', '1' , '002')";
+			String sql = "INSERT INTO CHAIR (ID, Type, Legs, Arms, Seat, Cushion, Price, ManuID) ";
+			sql += "VALUES ('T0000', 'Task', 'Y', 'Y', 'Y', 'Y', '-1' , '002')";
 			// Executing Command
 			myStatement.executeUpdate(sql);	
 			//Finding Combination Method to find combination
@@ -79,26 +90,31 @@ public class DataHandlerTest {
 	/** TEST 3
 	 * Inserts and Updates Inventory With Desired Output
 	 * Tests if ID's and sum of costs for cheapest combination are correct
+	 * Inserts its own records into the database to maintain integrity
+	 * Deletes its record at the end of the test
 	 */
 	@Test
 	public void testInsertUpdateInv() {
 		String furnCat = "chair";
 		String type = "Task";
-		int items = 1;
+		int items = 2;
 		DataHandler d = new DataHandler(furnCat, type, items);
 		// Setting up connections
 		Connection connect;
 		Statement myStatement = null;
 		// SELF NOTE: DEFAULTS
 		final String DBURL = "jdbc:mysql://localhost/inventory"; // store the database url information
-		final String USERNAME = "scm"; // store the user's account username
-		final String PASSWORD = "ensf409"; // store the user's account password
+		final String USERNAME ="John"; // store the user's account username
+		final String PASSWORD = "password"; // store the user's account password
 		ArrayList<ArrayList<String>> finalIDs = new ArrayList<ArrayList<String>>();
 		try {
 			connect = DriverManager.getConnection(DBURL, USERNAME, PASSWORD);
 			myStatement = connect.createStatement();
-			// Adding sql commands 
-			String sql = "INSERT INTO CHAIR (ID, Type, Legs, Arms, Seat, Cushion, Price, ManuID) VALUES ('A0000', 'Task', 'Y', 'Y', 'Y', 'Y', '1' , '002')";
+			// build query to insert 3 entries to be picked up and deleted
+			String sql = "INSERT INTO CHAIR (ID, Type, Legs, Arms, Seat, Cushion, Price, ManuID) ";
+			sql+= "VALUES ('T0000', 'Task', 'Y', 'Y', 'N', 'N', '-1' , '002'), ";
+			sql+= "('T1111', 'Task', 'N', 'N', 'Y', 'Y', '-1' , '002'), ";
+			sql += "('T2222', 'Task', 'Y', 'Y', 'Y', 'Y', '-1' , '002')";
 			// Executing Command
 			myStatement.executeUpdate(sql);	
 			//Finding Combination Method to find combination
@@ -107,8 +123,10 @@ public class DataHandlerTest {
 			finalIDs = d.getFinalIds();
 			// Deleting the used ID's
 			d.deleteUsedIds();
-			assertEquals("ERROR: Total is incorrect", 1, d.sumOfCosts()); // Tests Sum of costs
-			assertEquals("ERROR: Cheapest Combination not found", "A0000", finalIDs.get(0).get(0)); // Test if right ID picked
+			assertEquals("ERROR: Total is incorrect", -3, d.sumOfCosts()); // Tests Sum of costs
+			assertEquals("ERROR: Cheapest Combination not found", "T0000", finalIDs.get(0).get(0)); // Test if right ID picked
+			assertEquals("ERROR: Cheapest Combination not found", "T1111", finalIDs.get(0).get(1)); // Test if right ID picked
+			assertEquals("ERROR: Cheapest Combination not found", "T2222", finalIDs.get(1).get(0)); // Test if right ID picked
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -129,14 +147,15 @@ public class DataHandlerTest {
 		Statement myStatement = null;
 		// SELF NOTE: DEFAULTS
 		final String DBURL = "jdbc:mysql://localhost/inventory"; // store the database url information
-		final String USERNAME = "scm"; // store the user's account username
-		final String PASSWORD = "ensf409"; // store the user's account password
+		final String USERNAME = "John"; // store the user's account username
+		final String PASSWORD = "password"; // store the user's account password
 		ResultSet rs = null;
 		try {
 			connect = DriverManager.getConnection(DBURL, USERNAME, PASSWORD);
 			myStatement = connect.createStatement();
-			// Adding sql commands to 
-			String sql = "INSERT INTO CHAIR (ID, Type, Legs, Arms, Seat, Cushion, Price, ManuID) VALUES ('A0000', 'Task', 'Y', 'Y', 'Y', 'Y', '1' , '002')";
+			// builds query to insert cheapest combination for testing
+			String sql = "INSERT INTO CHAIR (ID, Type, Legs, Arms, Seat, Cushion, Price, ManuID) ";
+			sql += "VALUES ('A0000', 'Task', 'Y', 'Y', 'Y', 'Y', '-1' , '002')";
 			// Executes Insertion/Update
 			myStatement.executeUpdate(sql);
 			d.findCombo(); //Find's combination
@@ -177,7 +196,7 @@ public class DataHandlerTest {
 		DataHandler d = new DataHandler(furnCat, type, items);
 		// New IO Object
 		IO i = new IO();
-		String input = "no"; // INPUT IS INSERTED "no" WHEN CUSTOMER IS ASKED IF THEY ARE HAPPY
+		String input = "no"; // simulates consumer declining the order after combination is found
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
 		boolean check = i.checkWithUser(); // Should return false
@@ -196,7 +215,7 @@ public class DataHandlerTest {
 		DataHandler d = new DataHandler(furnCat, type, items);
 		// New IO Object
 		IO i = new IO();
-		String input = "yes"; // INPUT IS INSERTED "yes" WHEN CUSTOMER IS ASKED IF THEY ARE HAPPY
+		String input = "yes"; // simulates consumer accepting the order after combination is found
 		InputStream in = new ByteArrayInputStream(input.getBytes());
 		System.setIn(in);
 		boolean check = i.checkWithUser(); // Should return True

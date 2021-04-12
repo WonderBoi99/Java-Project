@@ -25,8 +25,8 @@ It handles interaction with the database and calculation of recommendations
 public class DataHandler {
 	
 	public final String DBURL = "jdbc:mysql://localhost/inventory"; //store the database url information
-    public final String USERNAME = "scm";	//store the user's account username
-    public final String PASSWORD =  "ensf409";	//store the user's account password
+    public final String USERNAME = "John";	//store the user's account username
+    public final String PASSWORD =  "password";	//store the user's account password
 	
     private Connection connect; //connection
     private ResultSet results;	//results of query
@@ -70,10 +70,7 @@ public class DataHandler {
 
     /**
 	 * Constructor for DataHandler Class
-	 * initializes data members 
-	 * @param DBURL is the specific database URL that the user inputs that is for the target database
-	 * @param USERNAME is the username to access the database with
-	 * @param PASSWORD is the password corresponding to that username
+	 * initializes data members
 	 */	
     public DataHandler(String category, String type, int amount){
     	//these data members initalized based on where the user's database is located
